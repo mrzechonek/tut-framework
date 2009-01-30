@@ -69,9 +69,10 @@ inline int tut_main(int argc, char **argv, bool deferred_output = false) throw()
 {
     try
     {
-        tut::console_reporter * reporter;
-        std::ostringstream out;
+        tut::console_reporter *reporter;
+        tut::cppunit_reporter unit_reporter;
 
+        std::ostringstream out;
         if (deferred_output)
         {
             reporter = new tut::console_reporter(out);
@@ -81,6 +82,7 @@ inline int tut_main(int argc, char **argv, bool deferred_output = false) throw()
             reporter = new tut::console_reporter;
         }
         tut::runner.get().set_callback(reporter);
+        tut::runner.get().insert_callback(&unit_reporter);
 
         // Check command line options.
         switch(argc)
