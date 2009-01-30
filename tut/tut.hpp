@@ -22,6 +22,7 @@
 #include <winbase.h>
 #endif
 
+#if defined(linux)
 #include <errno.h>
 #include <unistd.h>
 #include <signal.h>
@@ -30,6 +31,7 @@
 #include <sys/types.h>
 #include <cstring>
 #include <cstdlib>
+#endif
 
 /**
  * Template Unit Tests Framework for C++.
@@ -113,79 +115,6 @@ public:
         current_test_name_ = current_test_name;
     }
 
-    pid_t fork()
-    {
-        // create pipe
-        int fds[2];
-        ensure(std::string("pipe() failed: ")+std::strerror(errno), ::pipe(fds) == 0);
-
-        pid_t pid = ::fork();
-
-        ensure(std::string("fork() failed: ")+std::strerror(errno), pid >= 0);
-
-        if(pid != 0)
-        {
-            // register the child in kill list
-            ensure("duplicated child", pids_.insert( std::make_pair(pid, fds[0]) ).second);
-        }
-        else
-        {
-            // shutdown all I/O in child
-            tut::runner.get().set_callback(NULL);
-
-            close(0);
-            close(1);
-            close(2);
-
-            // writing side
-            pipe_ = fds[1];
-        }
-
-        return pid;
-    }
-
-    void waitpid(pid_t pid, int *status, int signal = 0)
-    {
-        ensure("trying to wait for unknown pid", pids_.count(pid) > 0);
-
-        pid_t p = ::waitpid(pid, status, 0);
-        ensure("waitpid returned wrong pid", p == pid);
-
-        if(WIFSIGNALED(*status))
-        {
-            ensure("child killed by signal", WTERMSIG(*status) == signal);
-        }
-
-        // read from pipe here
-        fd_set fdset;
-        timeval tv;
-        tv.tv_sec = 0;
-        tv.tv_usec = 0;
-
-        FD_ZERO(&fdset);
-
-        int pipe = pids_[pid];
-        FD_SET(pipe, &fdset);
-
-        int result = select(pipe+1, &fdset, NULL, NULL, &tv);
-        ensure(std::string("select() failed: ")+std::strerror(errno), result >= 0);
-
-        if(result > 0)
-        {
-            ensure("select returned unknown file descriptor", FD_ISSET(pipe, &fdset) );
-
-            char buffer[1024];
-            int r = read(pipe, buffer, sizeof(buffer));
-            ensure("read() failed ", r >= 0);
-
-            if(r > 0)
-            {
-                fail(std::string("child failed: ") + std::string(buffer, buffer+r));
-            }
-        }
-    }
-
-
     const std::string& get_test_name() const
     {
         return current_test_name_;
@@ -214,6 +143,52 @@ public:
      */
     bool called_method_was_a_dummy_test_;
 
+#if defined(linux)
+    pid_t fork()
+    {
+        // create pipe
+        int fds[2];
+        ensure_errno("pipe() failed", ::pipe(fds) == 0);
+
+        pid_t pid = ::fork();
+
+        ensure_errno("fork() failed", pid >= 0);
+
+        if(pid != 0)
+        {
+            // register the child in kill list
+            close(fds[1]);
+            ensure("duplicated child", pids_.insert( std::make_pair(pid, fds[0]) ).second);
+        }
+        else
+        {
+            // shutdown reporter in the child
+            tut::runner.get().set_callback(NULL);
+
+            // writing side
+            close(fds[0]);
+            pipe_ = fds[1];
+        }
+
+        return pid;
+    }
+
+    void ensure_child_exit(pid_t pid, int exit_status = 0)
+    {
+        int status;
+        waitpid_(pid, &status);
+
+        ensure_child_exit_(status, exit_status);
+    }
+
+    void ensure_child_signal(pid_t pid, int signal = SIGTERM)
+    {
+        int status;
+        waitpid_(pid, &status);
+
+        ensure_child_signal_(status, signal);
+    }
+
     ~test_object()
     {
         // we have forked
@@ -229,24 +204,161 @@ public:
 
             for(std::map<pid_t, int>::iterator i = pids_.begin(); i != pids_.end(); ++i)
             {
-                if(kill(i->first, SIGTERM) == 0)
+                if(::kill(i->first, SIGTERM) == 0)
                 {
                     int status;
-                    waitpid(i->first, &status, SIGTERM);
+                    waitpid_(i->first, &status);
+                    if( WIFSIGNALED(status) )
+                    {
+                        ensure_child_signal_(status, SIGTERM);
+                    }
+
+                    if( WIFEXITED(status) || WIFSTOPPED(status) )
+                    {
+                        ensure_child_exit_(status, 0);
+                    }
+
+
                 }
                 else if(errno != ESRCH)
                 {
                     std::ostringstream ss;
                     ss << "could not kill child " << i->first;
-                    fail(ss.str());
+                    ensure_errno(ss.str().c_str(), false);
                 }
             }
         }
     }
+#endif
 
 private:
+    void receive_result_(std::istream &ss)
+    {
+        int type;
+        std::string exception_typeid;
+        std::string message;
+
+        ss >> type >> exception_typeid;
+
+        std::getline(ss, message);
+
+        throw rethrown(type, exception_typeid, "child failed:" + message);
+    }
+
+#if defined(linux)
+    void waitpid_(pid_t pid, int *status)
+    {
+        ensure("trying to wait for unknown pid", pids_.count(pid) > 0);
+
+        pid_t p = ::waitpid(pid, status, 0);
+        ensure("waitpid returned wrong pid", p == pid);
+
+
+        // read from pipe here
+        fd_set fdset;
+        timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = 0;
+
+        FD_ZERO(&fdset);
+
+        int pipe = pids_[pid];
+        FD_SET(pipe, &fdset);
+
+        int result = select(pipe+1, &fdset, NULL, NULL, &tv);
+        ensure_errno("select() failed", result >= 0);
+
+        if(result > 0)
+        {
+            ensure("select returned unknown file descriptor", FD_ISSET(pipe, &fdset) );
+
+            std::stringstream ss;
+
+            //TODO: max failure length
+            char buffer[1024];
+            int r = read(pipe, buffer, sizeof(buffer));
+            ensure_errno("read() failed", r >= 0);
+
+            if(r > 0)
+            {
+                ss.write(buffer, r);
+                receive_result_(ss);
+            }
+        }
+    }
+
+    void ensure_child_exit_(int status, int exit_status)
+    {
+        if(WIFSIGNALED(status))
+        {
+            std::stringstream ss;
+            ss << "child killed by signal " << WTERMSIG(status) 
+                << ": expected exit with code " << exit_status;
+
+            throw failure(ss.str().c_str());
+        }
+
+        if(WIFEXITED(status))
+        {
+            if(WEXITSTATUS(status) != exit_status)
+            {
+                std::stringstream ss;
+                ss << "child exited, expected '"
+                    << exit_status
+                    << "' actual '"
+                    << WEXITSTATUS(status)
+                    << '\'';
+
+                throw failure(ss.str().c_str());
+            }
+        }
+
+        if(WIFSTOPPED(status))
+        {
+            std::stringstream ss;
+            ss << "child stopped by signal " << WTERMSIG(status) 
+                << ": expected exit with code " << exit_status;
+            throw failure(ss.str().c_str());
+        }
+    }
+
+    void ensure_child_signal_(int status, int signal)
+    {
+        if(WIFSIGNALED(status))
+        {
+            if(WTERMSIG(status) != signal)
+            {
+                std::stringstream ss;
+                ss << "child killed by signal, expected '"
+                    << signal
+                    << "' actual '"
+                    << WTERMSIG(status)
+                    << '\'';
+                throw failure(ss.str().c_str());
+            }
+        }
+
+        if(WIFEXITED(status))
+        {
+            std::stringstream ss;
+            ss << "child exited with code " << WEXITSTATUS(status) 
+                << ": expected signal " << signal;
+
+            throw failure(ss.str().c_str());
+        }
+
+        if(WIFSTOPPED(status))
+        {
+            std::stringstream ss;
+            ss << "child stopped by signal " << WTERMSIG(status) 
+                << ": expected kill by signal " << signal;
+
+            throw failure(ss.str().c_str());
+        }
+    }
 
     std::map<pid_t, int> pids_;
+#endif
     int             pipe_;
 
     std::string     current_test_name_;
@@ -521,9 +633,14 @@ public:
         ensure("pipe is invalid", tr.pipe != -1);
         if(tr.result != test_result::ok)
         {
-            std::string msg = tr.message;
-            int w = write(tr.pipe, msg.c_str(), msg.length());
-            ensure(std::string("write() failed: ") + std::strerror(errno), w == int(msg.length()));
+            std::stringstream ss;
+            ss << int(tr.result) << " "
+                << tr.exception_typeid << " "
+                << tr.message;
+            int size = ss.str().length();
+
+            int w = write(tr.pipe, ss.str().c_str(), size);
+            ensure_errno("write() failed", w == size);
         }
     }
 
@@ -549,7 +666,7 @@ public:
             } catch(...) {
                 if(obj.get() != 0)
                 {
-                    // test failed, so get the pipe
+                    // test failed, so get the pipe in case we are the child
                     pipe = obj->get_pipe();
                 }
                 // and rethrow the exception
