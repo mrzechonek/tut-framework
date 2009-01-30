@@ -67,7 +67,28 @@ Alas.
 First, from a pure theoretical POV, testing private methods is considered harmful as it exposes class internals,
 while traditional testing focuses on public interface only.
 
-Second, it's just plain impossible in C++ without making TUT a friend of tested class (which can be done, I guess, I just never tried).
+Second, it's just plain impossible in C++ without making TUT a friend of tested class. It is strongly discouraged,
+since it makes actual implementation dependant on TUT internals. Don't be surprised if things do not compile with
+next release.
+
+If you really must, friend declaration should look like this:
+
+{coderay:: c}
+// forward declaration is necessary
+namespace tut
+{
+    template<typename T>
+    class test_object;
+}
+
+class MyClass
+{
+    template<typename T>
+    friend class tut::test_object;
+
+    // code follows
+}
+{coderay}
 
 On the other hand, most compilers do not change the ABI when moving private section around, so exposing all internals to TUT might be
 as simple as below. Your mileage may vary, though.

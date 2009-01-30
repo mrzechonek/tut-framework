@@ -52,7 +52,7 @@ template<>
 void object::test<3>()
 {
     set_test_name("checks positive ensure_equals with complex matching types");
-    
+
     ensure_equals("string==string", string("foo"), string("foo"));
 }
 
@@ -64,7 +64,7 @@ template<>
 void object::test<10>()
 {
     set_test_name("checks negative ensure_equals with simple types");
-    
+
     volatile int n = 1; // to stop optimization
     try
     {
@@ -89,7 +89,7 @@ void object::test<11>()
 {
     set_test_name("checks negative ensure_equals with complex non-matching"
         " types");
-    
+
     try
     {
         ensure_equals("string(foo)!=boo", string("foo"), "boo");
@@ -112,7 +112,7 @@ template<>
 void object::test<12>()
 {
     set_test_name("checks negative ensure_equals with complex matching types");
-    
+
     try
     {
         ensure_equals("string(foo)!=string(boo)", string("foo"), string("boo"));
@@ -125,6 +125,20 @@ void object::test<12>()
             throw runtime_error("contains wrong message");
         }
     }
+}
+
+/**
+ * Checks positive ensure_equals with floating point type (double)
+ */
+template<>
+template<>
+void object::test<13>()
+{
+    double lhs = 6.28;
+    double rhs = 3.14;
+    lhs /= 2;
+
+    ensure_equals("double==double", lhs, rhs);
 }
 
 }
