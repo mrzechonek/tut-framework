@@ -22,6 +22,15 @@
 #include <winbase.h>
 #endif
 
+#include <errno.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <cstring>
+#include <cstdlib>
+
 /**
  * Template Unit Tests Framework for C++.
  * http://tut.dozen.ru
@@ -77,6 +86,169 @@ public:
     bool called_method_was_a_dummy_test_;
 
 private:
+    std::string     current_test_name_;
+};
+
+
+/**
+ * Test object. Contains data test run upon and default test method
+ * implementation. Inherited from Data to allow tests to
+ * access test data as members.
+ */
+template <class Data>
+class test_object : public Data
+{
+public:
+
+    /**
+     * Default constructor
+     */
+    test_object()
+        : pipe_(-1)
+    {
+    }
+
+    void set_test_name(const std::string& current_test_name)
+    {
+        current_test_name_ = current_test_name;
+    }
+
+    pid_t fork()
+    {
+        // create pipe
+        int fds[2];
+        ensure(std::string("pipe() failed: ")+std::strerror(errno), ::pipe(fds) == 0);
+
+        pid_t pid = ::fork();
+
+        ensure(std::string("fork() failed: ")+std::strerror(errno), pid >= 0);
+
+        if(pid != 0)
+        {
+            // register the child in kill list
+            ensure("duplicated child", pids_.insert( std::make_pair(pid, fds[0]) ).second);
+        }
+        else
+        {
+            // shutdown all I/O in child
+            tut::runner.get().set_callback(NULL);
+
+            close(0);
+            close(1);
+            close(2);
+
+            // writing side
+            pipe_ = fds[1];
+        }
+
+        return pid;
+    }
+
+    void waitpid(pid_t pid, int *status, int signal = 0)
+    {
+        ensure("trying to wait for unknown pid", pids_.count(pid) > 0);
+
+        pid_t p = ::waitpid(pid, status, 0);
+        ensure("waitpid returned wrong pid", p == pid);
+
+        if(WIFSIGNALED(*status))
+        {
+            ensure("child killed by signal", WTERMSIG(*status) == signal);
+        }
+
+        // read from pipe here
+        fd_set fdset;
+        timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = 0;
+
+        FD_ZERO(&fdset);
+
+        int pipe = pids_[pid];
+        FD_SET(pipe, &fdset);
+
+        int result = select(pipe+1, &fdset, NULL, NULL, &tv);
+        ensure(std::string("select() failed: ")+std::strerror(errno), result >= 0);
+
+        if(result > 0)
+        {
+            ensure("select returned unknown file descriptor", FD_ISSET(pipe, &fdset) );
+
+            char buffer[1024];
+            int r = read(pipe, buffer, sizeof(buffer));
+            ensure("read() failed ", r >= 0);
+
+            if(r > 0)
+            {
+                fail(std::string("child failed: ") + std::string(buffer, buffer+r));
+            }
+        }
+    }
+
+
+    const std::string& get_test_name() const
+    {
+        return current_test_name_;
+    }
+
+    int get_pipe() const
+    {
+        return pipe_;
+    }
+
+    /**
+     * Default do-nothing test.
+     */
+    template <int n>
+    void test()
+    {
+        called_method_was_a_dummy_test_ = true;
+    }
+
+    /**
+     * The flag is set to true by default (dummy) test.
+     * Used to detect usused test numbers and avoid unnecessary
+     * test object creation which may be time-consuming depending
+     * on operations described in Data::Data() and Data::~Data().
+     * TODO: replace with throwing special exception from default test.
+     */
+    bool called_method_was_a_dummy_test_;
+
+    ~test_object()
+    {
+        // we have forked
+        if(pipe_ != -1)
+        {
+            // in child, force exit
+            std::exit(0);
+        }
+
+        if(!pids_.empty())
+        {
+            // in parent, reap children
+
+            for(std::map<pid_t, int>::iterator i = pids_.begin(); i != pids_.end(); ++i)
+            {
+                if(kill(i->first, SIGTERM) == 0)
+                {
+                    int status;
+                    waitpid(i->first, &status, SIGTERM);
+                }
+                else if(errno != ESRCH)
+                {
+                    std::ostringstream ss;
+                    ss << "could not kill child " << i->first;
+                    fail(ss.str());
+                }
+            }
+        }
+    }
+
+private:
+
+    std::map<pid_t, int> pids_;
+    int             pipe_;
+
     std::string     current_test_name_;
 };
 
@@ -344,6 +516,17 @@ public:
         return tr;
     }
 
+    void send_result_(const test_result &tr)
+    {
+        ensure("pipe is invalid", tr.pipe != -1);
+        if(tr.result != test_result::ok)
+        {
+            std::string msg = tr.message;
+            int w = write(tr.pipe, msg.c_str(), msg.length());
+            ensure(std::string("write() failed: ") + std::strerror(errno), w == int(msg.length()));
+        }
+    }
+
 
     /**
      * VC allows only one exception handling type per function,
@@ -359,7 +542,18 @@ public:
         {
             if (run_test_seh_(ti->second, obj, current_test_name) == false)
             {
-                throw seh("seh");
+                if (run_test_seh_(ti->second, obj, current_test_name) == false)
+                {
+                    throw seh("seh");
+                }
+            } catch(...) {
+                if(obj.get() != 0)
+                {
+                    // test failed, so get the pipe
+                    pipe = obj->get_pipe();
+                }
+                // and rethrow the exception
+                throw;
             }
         }
         catch (const no_such_test&)
@@ -400,6 +594,8 @@ public:
         {
             tr.name = current_test_name;
         }
+
+        tr.pipe = pipe;
 
         return tr;
     }
