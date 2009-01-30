@@ -4,7 +4,7 @@ desc: changelog, releases and whatnot
 ---
 
 TUT-2008-11-30
-==============
+--------------
 Introduces a whole new feature of multi-process testing. This includes forking, reporting
 failed tests in children, controlling their exit status and cleanup code:
 
@@ -24,12 +24,13 @@ Added ensure\_errno test for meaningful reporting of failed system calls.
 Both features are available only on \*nix platforms.
 
 TUT-2007-07-06
-==============
+--------------
 Introduced new header include style. There are two ways you can include the TUT headers:
 
 {coderay:: c}
 #include <tut.h>
 #include <tut/tut.hpp>
+{coderay}
 
 The second option is preferred method whereas the first option is to provide backward 
 compatibility with clients of the previous releases.
@@ -37,14 +38,14 @@ compatibility with clients of the previous releases.
 Minor fixes for Borland C++ Builder 6 and Microsoft Visual Studio 2005.
 
 TUT-2007-03-19
-==============
+--------------
 Introduced a new exception `tut_error` as base for all TUT exceptions.
 I have two reasons to do it:
 
 *   To avoid interference with `std::logic_error` leading to annoying pitfalls
     in inaccurate test code. For example:
-{coderay:: c}
 
+{coderay:: c}
 // function to test
 void foo(bool cond)
 {
@@ -81,7 +82,7 @@ Minor changes:
     more readable than `ensure(!condition)`
 
 TUT-2007-02-03
-==============
+--------------
 Microsoft Visual C++ 2005 is supported. This version of compiler supports
 standard C++ exception handling in accordance with the C++ standard. It means 
 that only synchronous C++ exceptions thrown with a throw statement will be 
@@ -94,8 +95,8 @@ version of compiler (option /EHs). But for the new version I have to turn on
 asynchronous exception handling (option /EHa).
 
 TUT-2006-11-04
-==============
-Fix: lost changes from version _TUT-2006-03-29_ are restored.
+--------------
+Fix: lost changes from version `TUT-2006-03-29` are restored.
 
 Fix: errors appeared while compiling restartable example are fixed. 
 But there are a lot of outstanding works to support completely
@@ -104,7 +105,7 @@ the last changes.
 Jamfiles for examples added.
 
 TUT-2006-10-31
-==============
+--------------
 Today's update is the work of a new TUT's contributor, Denis Kononenko.
 
 Jamfile added to build TUT Framework using [Boost Build System v2](http://boost.sourceforge.net/boost-build2/)
@@ -135,22 +136,22 @@ Also a custom reporter can retrieve the test name using `tut::test_result::name`
 Minor fix: TUT selftest didn't exit with code 0 if there have been failed tests.
 
 TUT-2006-03-29
-==============
+--------------
 New callback events: `group_started()` and `group_completed()`. 
 Thanks to Mateusz Loskot and Bartlomiej Kalinowski for pointing out to the incompleteness of the interface.
 
 TUT-2005-06-22
-==============
+--------------
 `ensure()` now is a template and thus accepts both `const char*` and `std::string`
 
 Optimization level is reduced to -g for GCC 3.x in samples since otherwise I have a sigsegv.
 
 TUT-2005-05-19
-==============
+--------------
 Fix: Win32 doesn't allow to mix `try` / `catch` and `_try` / `_catch`. Mea culpa.
 
 TUT-2005-05-16
-==============
+--------------
 Bugfix release (thanks to Denis Kononenko).
 
 An exception in test group constructor was causing all tests in the group
@@ -162,13 +163,13 @@ An exception in test group ctor terminates the whole group. No tests in this gro
 First failed test has reason set to ex\_ctor, and default reporter shows it as \[1=C\].
 
 TUT-2004-03-26
-==============
+--------------
 Minor, really minor change: dropped extra `&&` from
 end of declaration which prevented TUT from being used
 with Sun C++ compiler (thanks to Andrey Sidorenko)
 
 TUT-2003-08-17
-==============
+--------------
 Usablility changes (thanks to Justin Sampson):
 
 *   Class tut::reporter has new method `bool all_ok() const` to check if everything goes/gone fine.
@@ -177,7 +178,7 @@ Usablility changes (thanks to Justin Sampson):
 	now be called not only inside test object methods, but from any code location.
 
 TUT-2003-07-04
-==============
+--------------
 TUT now works under VC7 2003. VC7 2002 is not supported,
 and will not be supported due to lack of standard features.
 
@@ -200,7 +201,7 @@ changes are made in SEH code to replace throw with good old return.
 Makefiles organization is refactored.
 
 TUT-2003-06-25
-==============
+--------------
 Default results callback handler is moved into separate optional 
 header `tut_reporter.h` and refactored to increase verbosity
 level. There are also a few more self-tests to cover the reporter.  Usage: 
@@ -231,7 +232,7 @@ SCO platforms are no longer supported.
 SCO is no more a software company, it produces only sues.
 
 TUT-2003-04-28
-==============
+--------------
 Tar.gz is now built using real TAR and GZIP applications, not 7ZIP.
 
 Fixed missed STL includes required for some platforms.

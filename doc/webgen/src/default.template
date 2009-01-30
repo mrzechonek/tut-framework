@@ -24,6 +24,15 @@ template: default.template
         <h1><span>{desc: }</span>{title: } </h1>
         <webgen:block name="content"/>
     </div>
+
+    <div id="footer">
+
+        <h1>
+            <span>last change: {modified_at: }</span>
+            <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" /></a>
+            created with <a href="http://webgen.rubyforge.org/index.html">webgen</a>
+        </h1>
+    </div>
   </body>
 </html>
 

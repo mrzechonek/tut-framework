@@ -1,10 +1,5 @@
 \--- !omap
 
-- download.*.html:
-    title: Download
-    in_menu: true
-    url: 'http://sourceforge.net/project/showfiles.php?group_id=69383&package_id=307998'
-
 - forum.*.html:
     title: Forum
     in_menu: true
