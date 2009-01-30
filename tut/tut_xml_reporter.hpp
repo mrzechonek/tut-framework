@@ -119,7 +119,7 @@ protected:
             }
 
             out << "  <testcase classname=\"" << encode(tr.group) << "\" name=\"" << encode(tr.name) << "\">" << endl;
-            out << "    <" << tag << " message=\"" << err_msg << "\"" << " type=\"" << failure_type << "\";
+            out << "    <" << tag << " message=\"" << err_msg << "\"" << " type=\"" << failure_type << "\"";
 #if defined(TUT_USE_POSIX)
             if(pid != getpid())
             {
@@ -127,7 +127,7 @@ protected:
             }
 #endif
             out << ">" << err_msg << "</" << tag << ">" << endl;
-            out < "  </testcase>";
+            out << "  </testcase>";
         }
 
         return out.str();
