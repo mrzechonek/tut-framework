@@ -1,12 +1,12 @@
 #include <tut/tut.hpp>
-#include <tut/tut_reporter.hpp>
+#include <tut/tut_console_reporter.hpp>
 #include <sstream>
 
 using std::stringstream;
 
 namespace tut
 {
-    
+
 /**
  * Testing reporter.
  */
@@ -18,7 +18,7 @@ struct reporter_test
     test_result tr4;
     test_result tr5;
 
-    reporter_test() 
+    reporter_test()
         : tr1("foo", 1, "", test_result::ok),
           tr2("foo", 2, "", test_result::fail),
           tr3("foo", 3, "", test_result::ex),
@@ -46,7 +46,7 @@ template<>
 void object::test<2>()
 {
     stringstream ss;
-    reporter repo(ss);
+    console_reporter repo(ss);
 
     ensure_equals("ok count", repo.ok_count, 0);
     ensure_equals("fail count", repo.failures_count, 0);
@@ -84,7 +84,7 @@ template<>
 void object::test<3>()
 {
     std::stringstream ss;
-    tut::reporter repo(ss);
+    tut::console_reporter repo(ss);
 
     repo.run_started();
     repo.test_completed(tr1);
@@ -101,7 +101,7 @@ template<>
 void object::test<4>()
 {
     stringstream ss;
-    reporter repo(ss);
+    console_reporter repo(ss);
 
     repo.run_started();
     repo.test_completed(tr1);

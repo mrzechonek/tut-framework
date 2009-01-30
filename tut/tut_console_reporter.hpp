@@ -50,7 +50,7 @@ namespace tut
 /**
  * Default TUT callback handler.
  */
-class reporter : public tut::callback
+class console_reporter : public tut::callback
 {
     std::string current_group;
     typedef std::vector<tut::test_result> not_passed_list;
@@ -65,13 +65,13 @@ public:
     int terminations_count;
     int warnings_count;
 
-    reporter()
+    console_reporter()
         : os(std::cout)
     {
         init();
     }
 
-    reporter(std::ostream& out)
+    console_reporter(std::ostream& out)
         : os(out)
     {
         init();
@@ -91,34 +91,27 @@ public:
         }
 
         os << tr << std::flush;
-        if (tr.result == tut::test_result::ok)
-        {
-            ok_count++;
-        }
-        else if (tr.result == tut::test_result::ex)
-        {
-            exceptions_count++;
-        }
-        else if (tr.result == tut::test_result::ex_ctor)
-        {
-            exceptions_count++;
-        }
-        else if (tr.result == tut::test_result::fail)
-        {
-            failures_count++;
-        }
-        else if (tr.result == tut::test_result::rethrown)
-        {
-            failures_count++;
-        }
-        else if (tr.result == tut::test_result::warn)
-        {
-            warnings_count++;
-        }
-        else
-        {
-            terminations_count++;
-        }
+
+        // update global statistics
+        switch (tr.result) {
+            case test_result::ok:
+                ok_count++;
+                break;
+            case test_result::fail:
+            case test_result::rethrown:
+                failures_count++;
+                break;
+            case test_result::ex:
+            case test_result::ex_ctor:
+                exceptions_count++;
+                break;
+            case test_result::warn:
+                warnings_count++;
+                break;
+            case test_result::term:
+                terminations_count++;
+                break;
+        } // switch
 
         if (tr.result != tut::test_result::ok)
         {

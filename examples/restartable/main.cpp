@@ -2,18 +2,18 @@
 #include <exception>
 
 #include <tut/tut_restartable.hpp>
-#include <tut/tut_reporter.hpp>
+#include <tut/tut_console_reporter.hpp>
 
 using std::cerr;
 using std::endl;
 using std::exception;
 
-using tut::reporter;
+using tut::console_reporter;
 using tut::restartable_wrapper;
 
 namespace tut
 {
-    
+
 test_runner_singleton runner;
 
 }
@@ -25,7 +25,7 @@ int main()
 
     try
     {
-        reporter visi;
+        console_reporter visi;
         restartable_wrapper restartable;
 
         restartable.set_callback(&visi);

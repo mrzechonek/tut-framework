@@ -1,5 +1,5 @@
 #include <tut/tut.hpp>
-#include <tut/tut_reporter.hpp>
+#include <tut/tut_console_reporter.hpp>
 
 #include <exception>
 #include <iostream>
@@ -13,14 +13,14 @@ using std::endl;
 
 namespace tut
 {
-    
+
 test_runner_singleton runner;
 
 }
 
 int main()
 {
-    tut::reporter reporter;
+    tut::console_reporter reporter;
 
     try
     {
@@ -30,11 +30,11 @@ int main()
         if (!reporter.all_ok())
         {
             cout << endl;
-            cout << "*********************************************************" 
+            cout << "*********************************************************"
                 << endl;
-            cout << "WARNING: THIS VERSION OF TUT IS UNUSABLE DUE TO ERRORS!!!" 
+            cout << "WARNING: THIS VERSION OF TUT IS UNUSABLE DUE TO ERRORS!!!"
                 << endl;
-            cout << "*********************************************************" 
+            cout << "*********************************************************"
                 << endl;
         }
         else
