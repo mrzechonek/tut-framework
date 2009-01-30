@@ -4,3 +4,4 @@ default_meta_info:
 
 website.lang: en
 
+tag.coderay.line_numbers: false

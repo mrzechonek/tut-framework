@@ -15,7 +15,7 @@ TUT is a small and portable unit test framework for C++.
 *   TUT is *free* and distributed under a BSD-like license.
 *   TUT tests are easy to read and maintain. Here's the simplest test file possible:
 
-{coderay:: {lang: c, line_numbers: false}}
+{coderay:: c}
 #include <tut.h>
 
 namespace tut
