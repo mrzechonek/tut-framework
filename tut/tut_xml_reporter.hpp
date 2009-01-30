@@ -222,6 +222,7 @@ public:
                 ok_count++;
                 break;
             case test_result::fail:
+            case test_result::rethrown:
                 failures_count++;
                 break;
             case test_result::ex:
