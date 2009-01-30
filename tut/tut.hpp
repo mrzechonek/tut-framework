@@ -234,15 +234,22 @@ public:
 private:
     void receive_result_(std::istream &ss)
     {
+        test_result tr;
+
         int type;
-        std::string exception_typeid;
-        std::string message;
+        ss >> type;
+        tr.result = test_result::result_type(type);
+        ss.ignore(1024, '\n');
 
-        ss >> type >> exception_typeid;
+        std::getline(ss, tr.group);
+        ss >> tr.test;
+        ss.ignore(1024, '\n');
+        std::getline(ss, tr.name);
+        std::getline(ss, tr.exception_typeid);
+        std::getline(ss, tr.message);
+        tr.message = "child failed: " + tr.message;
 
-        std::getline(ss, message);
-
-        throw rethrown(type, exception_typeid, "child failed:" + message);
+        throw rethrown(tr);
     }
 
 #if defined(linux)
@@ -634,9 +641,12 @@ public:
         if(tr.result != test_result::ok)
         {
             std::stringstream ss;
-            ss << int(tr.result) << " "
-                << tr.exception_typeid << " "
-                << tr.message;
+            ss << int(tr.result) << "\n"
+                << tr.group << "\n"
+                << tr.test << "\n"
+                << tr.name << "\n"
+                << tr.exception_typeid << "\n"
+                << tr.message << "\n";
             int size = ss.str().length();
 
             int w = write(tr.pipe, ss.str().c_str(), size);
