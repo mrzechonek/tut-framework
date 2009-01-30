@@ -1,0 +1,32 @@
+---
+template: default.template
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{lang:}">
+  <head>
+    <title>TUT: C++ Template Unit Test Framework</title>
+    <meta name="keywords" content="C++ Unit Test Simple" />
+    <meta name="description" content="TUT: C++ Template Unit Test Framework" />
+    <meta name="generator" content="webgen - http://webgen.rubyforge.com/" />
+    <link href="{relocatable: default.css}" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>TUT: C++ Template Unit Test Framework</h1>
+    </div>
+
+    <div id="menu">
+        {menu: {used_nodes: all}}
+    </div>
+
+    <div id="body">
+        <h1><span>{desc: }</span>{title: } </h1>
+        <webgen:block name="content"/>
+    </div>
+  </body>
+</html>
+
+<!--
+    vim:ft=xhtml
+ -->

@@ -1,0 +1,31 @@
+--- name:alcn
+download.*.html:
+  sort_info: 1
+
+index.*.html:
+  sort_info: 2
+
+example.*.html:
+  sort_info: 3
+
+howto.*.html:
+  sort_info: 4
+
+forum.html:
+  title: Forum
+  sort_info: 5 
+  url: 'http://sourceforge.net/forum/forum.php?forum_id=719643'
+
+faq.*.html:
+  sort_info: 6
+
+authors.*.html:
+  sort_info: 7
+
+links.*.html:
+  sort_info: 8
+
+copyright.*.html:
+  sort_info: 9
+
+

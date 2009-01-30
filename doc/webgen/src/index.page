@@ -1,0 +1,42 @@
+---
+title: Introduction
+desc: an elevator pitch
+---
+
+TUT is a small and portable unit test framework for C++. 
+
+*   TUT is *very portable*: no matter what compiler or OS do you use.
+*   TUT consists of *header files only*. No libraries required.
+*   Custom *reporter interface* allows to integrate TUT with virtually any IDE or tool in the world.
+*   Tests are organised into *named test groups*. 
+*   *Regression* (all tests in the application), *one-group* or *one-test* execution.
+*   *Pure C++*, no macros!
+*   Support for *multi-process* testing.
+*   TUT is *free* and distributed under a BSD-like license.
+*   TUT tests are easy to read and maintain. Here's the simplest test file possible:
+
+{coderay:: {lang: c, line_numbers: false}}
+#include <tut.h>
+
+namespace tut
+{
+    struct basic{};
+    typedef test_group<basic> factory;
+    typedef factory::object object;
+}
+
+namespace
+{
+    tut::factory tf("basic test");
+}
+
+namespace tut
+{
+    template<>
+    template<>
+    void object::test<1>()
+    {
+        ensure_equals("2+2=?", 2+2, 4);
+    }
+}
+{coderay}

@@ -1,0 +1,12 @@
+---
+title: Example
+desc: it's better to see once...
+---
+
+An example testgroup which tests a std::auto\_ptr implementation. Of course, those tests are far from complete.
+
+{coderay:: {lang: c, line_numbers: false}}
+{include_file: {filename: src/example.cpp, escape_html: false}}
+{coderay}
+
+
