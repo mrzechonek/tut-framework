@@ -1,11 +1,3 @@
-/*
- * tut_macros.h
- *
- * ECOS Library. IPT CS R&D CET ECOS Copyright 2008 Nokia
- * Siemens Networks. All right
- *
- *
- */
 #ifndef TUT_MACROS_H
 #define TUT_MACROS_H
 
