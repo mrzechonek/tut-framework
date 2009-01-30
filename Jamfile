@@ -8,11 +8,9 @@ project tut-framework
 	  $(SOURCE_DIR)
 	: requirements 
 	  <include>. 
-	  <toolset>msvc:<define>TUT_USE_SEH <asynch-exceptions>on
+	  <toolset>msvc:<define>TUT_USE_SEH
 	  <toolset>msvc-7.1:<asynch-exceptions>off
-	  <toolset>msvc-8.0express:<asynch-exceptions>on
-	  <toolset>msvc-8.0express:<asynch-exceptions>on
-	  <toolset>msvc-8.0express:<asynch-exceptions>on
+	  <toolset>msvc-8.0:<asynch-exceptions>on
 	  <toolset>msvc-8.0express:<asynch-exceptions>on
 	  <threading>single 
 	: default-build
