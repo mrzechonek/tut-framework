@@ -156,18 +156,22 @@ public:
 
         if(pid != 0)
         {
-            // register the child in kill list
-            close(fds[1]);
+            // in parent, register pid
             ensure("duplicated child", pids_.insert( std::make_pair(pid, fds[0]) ).second);
+
+            // close writing side
+            close(fds[1]);
         }
         else
         {
-            // shutdown reporter in the child
+            // in child, shutdown reporter
             tut::runner.get().set_callback(NULL);
 
-            // writing side
+            // close reading side
             close(fds[0]);
             pipe_ = fds[1];
+
+            //TODO: and install SIGTERM handler
         }
 
         return pid;
@@ -200,39 +204,79 @@ public:
 
         if(!pids_.empty())
         {
-            // in parent, reap children
+            std::stringstream ss;
 
+            // in parent, reap children
             for(std::map<pid_t, int>::iterator i = pids_.begin(); i != pids_.end(); ++i)
             {
-                if(::kill(i->first, SIGTERM) == 0)
-                {
-                    int status;
-                    waitpid_(i->first, &status);
-                    if( WIFSIGNALED(status) )
-                    {
-                        ensure_child_signal_(status, SIGTERM);
-                    }
-
-                    if( WIFEXITED(status) || WIFSTOPPED(status) )
-                    {
-                        ensure_child_exit_(status, 0);
-                    }
-
-
+                try {
+                    kill_child_(i->first);
+                } catch(const rethrown &ex) {
+                    ss << std::endl << "child " << ex.tr.pid << " has thrown an exception: " << ex.what();
+                } catch(const failure &ex) {
+                    ss << std::endl << ex.what();
                 }
-                else if(errno != ESRCH)
-                {
-                    std::ostringstream ss;
-                    ss << "could not kill child " << i->first;
-                    ensure_errno(ss.str().c_str(), false);
-                }
+            }
+
+            if(!ss.str().empty())
+            {
+                fail(ss.str().c_str());
             }
         }
     }
-#endif
 
 private:
-    void receive_result_(std::istream &ss)
+
+    void kill_child_(pid_t pid)
+    {
+        int status;
+
+        if(waitpid_(pid, &status, WNOHANG) == pid)
+        {
+            ensure_child_exit_(status, 0);
+            return;
+        }
+
+        if(::kill(pid, SIGTERM) != 0)
+        {
+            if(errno == ESRCH)
+            {
+                // no such process
+                return;
+            }
+            else
+            {
+                // cannot kill, we are in trouble
+                std::stringstream ss;
+                char e[1024];
+                ss << "child " << pid << " could not be killed, " << strerror_r(errno, e, sizeof(e)) << std::endl;
+                fail(ss.str());
+            }
+        }
+
+        if(waitpid_(pid, &status, WNOHANG) == pid)
+        {
+            // child killed, check signal
+            ensure_child_signal_(status, SIGTERM);
+            return;
+        }
+            
+        // child seems to be still exiting, give it some time
+        sleep(2);
+
+        if(waitpid_(pid, &status, WNOHANG) != pid)
+        {
+            // child is still running, kill it
+            if(::kill(pid, SIGKILL) ==0)
+            {
+                std::stringstream ss;
+                ss << "child " << pid << " had to be killed with SIGKILL";
+                fail(ss.str());
+            }
+        }
+    }
+
+    test_result receive_result_(std::istream &ss, pid_t pid)
     {
         test_result tr;
 
@@ -246,22 +290,26 @@ private:
         ss.ignore(1024, '\n');
         std::getline(ss, tr.name);
         std::getline(ss, tr.exception_typeid);
-        std::getline(ss, tr.message);
-        tr.message = "child failed: " + tr.message;
+        std::copy( std::istreambuf_iterator<char>(ss.rdbuf()),
+                   std::istreambuf_iterator<char>(),
+                   std::back_inserter(tr.message) );
 
-        throw rethrown(tr);
+        tr.pid = pid;
+
+        return tr;
     }
 
-#if defined(linux)
-    void waitpid_(pid_t pid, int *status)
+    pid_t waitpid_(pid_t pid, int *status, int flags = 0)
     {
         ensure("trying to wait for unknown pid", pids_.count(pid) > 0);
 
-        pid_t p = ::waitpid(pid, status, 0);
-        ensure("waitpid returned wrong pid", p == pid);
+        pid_t p = ::waitpid(pid, status, flags);
+        if( (flags & WNOHANG) && (p != pid) )
+        {
+            return p;
+        }
 
-
-        // read from pipe here
+        // read child result from pipe
         fd_set fdset;
         timeval tv;
         tv.tv_sec = 0;
@@ -273,25 +321,27 @@ private:
         FD_SET(pipe, &fdset);
 
         int result = select(pipe+1, &fdset, NULL, NULL, &tv);
-        ensure_errno("select() failed", result >= 0);
+        ensure_errno("sanity check on select() failed", result >= 0);
 
         if(result > 0)
         {
-            ensure("select returned unknown file descriptor", FD_ISSET(pipe, &fdset) );
+            ensure("sanity check on FD_ISSET() failed", FD_ISSET(pipe, &fdset) );
 
             std::stringstream ss;
 
             //TODO: max failure length
             char buffer[1024];
             int r = read(pipe, buffer, sizeof(buffer));
-            ensure_errno("read() failed", r >= 0);
+            ensure_errno("sanity check on read() failed", r >= 0);
 
             if(r > 0)
             {
                 ss.write(buffer, r);
-                receive_result_(ss);
+                throw rethrown( receive_result_(ss, pid) );
             }
         }
+
+        return pid;
     }
 
     void ensure_child_exit_(int status, int exit_status)
@@ -299,7 +349,7 @@ private:
         if(WIFSIGNALED(status))
         {
             std::stringstream ss;
-            ss << "child killed by signal " << WTERMSIG(status) 
+            ss << "child killed by signal " << WTERMSIG(status)
                 << ": expected exit with code " << exit_status;
 
             throw failure(ss.str().c_str());
@@ -323,7 +373,7 @@ private:
         if(WIFSTOPPED(status))
         {
             std::stringstream ss;
-            ss << "child stopped by signal " << WTERMSIG(status) 
+            ss << "child stopped by signal " << WTERMSIG(status)
                 << ": expected exit with code " << exit_status;
             throw failure(ss.str().c_str());
         }
@@ -348,7 +398,7 @@ private:
         if(WIFEXITED(status))
         {
             std::stringstream ss;
-            ss << "child exited with code " << WEXITSTATUS(status) 
+            ss << "child exited with code " << WEXITSTATUS(status)
                 << ": expected signal " << signal;
 
             throw failure(ss.str().c_str());
@@ -357,7 +407,7 @@ private:
         if(WIFSTOPPED(status))
         {
             std::stringstream ss;
-            ss << "child stopped by signal " << WTERMSIG(status) 
+            ss << "child stopped by signal " << WTERMSIG(status)
                 << ": expected kill by signal " << signal;
 
             throw failure(ss.str().c_str());
@@ -366,6 +416,8 @@ private:
 
     std::map<pid_t, int> pids_;
 #endif
+
+private:
     int             pipe_;
 
     std::string     current_test_name_;
@@ -645,8 +697,8 @@ public:
                 << tr.group << "\n"
                 << tr.test << "\n"
                 << tr.name << "\n"
-                << tr.exception_typeid << "\n"
-                << tr.message << "\n";
+                << tr.exception_typeid << "\n";
+            std::copy( tr.message.begin(), tr.message.end(), std::ostreambuf_iterator<char>(ss.rdbuf()) );
             int size = ss.str().length();
 
             int w = write(tr.pipe, ss.str().c_str(), size);
