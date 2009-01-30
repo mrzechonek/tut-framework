@@ -70,12 +70,12 @@ struct tut_posix
         return self->fork_();
     }
 
-    pid_t waitpid(pid_t pid, int *status)
+    pid_t waitpid(pid_t pid, int *status, int flags = 0)
     {
         test_object<T> *self = dynamic_cast< tut::test_object<T>* >(this);
         ensure("trying to call 'tut_waitpid' in ctor of test object", self != NULL);
 
-        return self->waitpid_(pid, status);
+        return self->waitpid_(pid, status, flags);
     }
 
     void ensure_child_exit(pid_t pid, int exit_status = 0)
