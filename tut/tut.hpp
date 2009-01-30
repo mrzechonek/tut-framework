@@ -11,6 +11,10 @@
 #include <algorithm>
 #include <typeinfo>
 
+#if defined(linux)
+#define TUT_USE_POSIX
+#endif
+
 #include "tut_exception.hpp"
 #include "tut_result.hpp"
 #include "tut_posix.hpp"

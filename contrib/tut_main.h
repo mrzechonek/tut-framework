@@ -11,6 +11,7 @@
 
 #include <tut/tut.hpp>
 #include <tut/tut_console_reporter.hpp>
+#include <tut/tut_cppunit_reporter.hpp>
 #include <iostream>
 
 namespace tut
