@@ -91,9 +91,9 @@ void ensure_equals(const LHS& actual, const RHS& expected)
 }
 
 template<typename M>
-void ensure_equals(const M& msg, const double& actual, const double& expected)
+void ensure_equals(const M& msg, const double& actual, const double& expected,
+                   const double& epsilon = std::numeric_limits<double>::epsilon())
 {
-    const double epsilon = std::numeric_limits<double>::epsilon();
     const double diff = actual - expected;
 
     if ( !((diff <= epsilon) && (diff >= -epsilon )) )
