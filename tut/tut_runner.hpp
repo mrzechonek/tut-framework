@@ -38,6 +38,13 @@ struct group_base
 struct callback
 {
     /**
+     * Default constructor.
+     */
+    callback()
+    {
+    }
+
+    /**
      * Virtual destructor is a must for subclassed types.
      */
     virtual ~callback()
@@ -81,6 +88,9 @@ struct callback
     virtual void run_completed()
     {
     }
+private:
+    callback(const callback &);
+    void operator=(const callback&);
 };
 
 /**
