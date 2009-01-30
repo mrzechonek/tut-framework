@@ -273,16 +273,6 @@ private:
             ss << "child " << pid << " had to be killed with SIGKILL";
             fail(ss.str());
         }
-
-            ensure_equals("wait after SIGKILL", waitpid_(pid, &status), pid);
-            ensure_child_signal_(status, SIGKILL);
-
-            ensure_equals("child process exists after SIGKILL", ::kill(pid, 0), -1);
-
-            std::stringstream ss;
-            ss << "child " << pid << " had to be killed with SIGKILL";
-            fail(ss.str());
-        }
     }
 
     test_result receive_result_(std::istream &ss, pid_t pid)

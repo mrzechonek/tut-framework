@@ -86,56 +86,6 @@ private:
 
 
 /**
- * Test object. Contains data test run upon and default test method
- * implementation. Inherited from Data to allow tests to
- * access test data as members.
- */
-template <class Data>
-class test_object : public Data, public test_object_posix
-{
-public:
-
-    /**
-     * Default constructor
-     */
-    test_object()
-    {
-    }
-
-    void set_test_name(const std::string& current_test_name)
-    {
-        current_test_name_ = current_test_name;
-    }
-
-    const std::string& get_test_name() const
-    {
-        return current_test_name_;
-    }
-
-    /**
-     * Default do-nothing test.
-     */
-    template <int n>
-    void test()
-    {
-        called_method_was_a_dummy_test_ = true;
-    }
-
-    /**
-     * The flag is set to true by default (dummy) test.
-     * Used to detect usused test numbers and avoid unnecessary
-     * test object creation which may be time-consuming depending
-     * on operations described in Data::Data() and Data::~Data().
-     * TODO: replace with throwing special exception from default test.
-     */
-    bool called_method_was_a_dummy_test_;
-
-private:
-    std::string     current_test_name_;
-};
-
-
-/**
  * Walks through test tree and stores address of each
  * test method in group. Instantiation stops at 0.
  */
@@ -398,26 +348,6 @@ public:
         return tr;
     }
 
-    void send_result_(const test_result &tr)
-    {
-        ensure("pipe is invalid", tr.pipe != -1);
-        if(tr.result != test_result::ok)
-        {
-            std::stringstream ss;
-            ss << int(tr.result) << "\n"
-                << tr.group << "\n"
-                << tr.test << "\n"
-                << tr.name << "\n"
-                << tr.exception_typeid << "\n";
-            std::copy( tr.message.begin(), tr.message.end(), std::ostreambuf_iterator<char>(ss.rdbuf()) );
-            int size = ss.str().length();
-
-            int w = write(tr.pipe, ss.str().c_str(), size);
-            ensure_errno("write() failed", w == size);
-        }
-    }
-
-
     /**
      * VC allows only one exception handling type per function,
      * so I have to split the method.
@@ -473,8 +403,6 @@ public:
         {
             tr.name = current_test_name;
         }
-
-        tr.pipe = pipe;
 
         return tr;
     }
