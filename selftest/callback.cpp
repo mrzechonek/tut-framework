@@ -137,7 +137,8 @@ void object::test<1>()
     set_test_name("running one test which finished ok");
     
     tr.set_callback(&callback);
-    tr.run_test("internal", 1);
+    test_result res;
+    ensure(tr.run_test("internal", 1, res));
     ensure_equals("size", called.size(), 5U);
     ensure_equals("0", called[0], RUN_STARTED);
     ensure_equals("1", called[1], GROUP_STARTED);
@@ -159,7 +160,8 @@ void object::test<2>()
     set_test_name("running one test throwing exception");
     
     tr.set_callback(&callback);
-    tr.run_test("internal", 3);
+    test_result res;
+    ensure(tr.run_test("internal", 3, res));
     ensure_equals("size", called.size(), 5U);
     ensure(called[0] == RUN_STARTED);
     ensure(called[1] == GROUP_STARTED);
@@ -258,7 +260,8 @@ void object::test<6>()
 
     try
     {
-        tr.run_test("internal", 100);
+        test_result res;
+        ensure_not(tr.run_test("internal", 100, res));
         fail();
     }
     catch(const std::exception&)

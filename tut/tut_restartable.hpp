@@ -7,11 +7,10 @@
 #include <stdexcept>
 
 /**
- * Template Unit Tests Framework for C++.
- * http://tut.dozen.ru
+ * Optional restartable wrapper for test_runner.
  *
- * Optional restartable wrapper for test_runner. Allows to restart test runs
- * finished due to abnormal test application termination (such as segmentation
+ * Allows to restart test runs finished due to abnormal
+ * test application termination (such as segmentation
  * fault or math error).
  *
  * @author Vladimir Dyuzhev, Vladimir.Dyuzhev@gmail.com
@@ -124,12 +123,12 @@ void serialize(std::ostream& os, const tut::test_result& tr)
 /**
  * deserialization for test_result
  */
-void deserialize(std::istream& is, tut::test_result& tr)
+bool deserialize(std::istream& is, tut::test_result& tr)
 {
     std::getline(is,tr.group);
     if (is.eof())
     {
-        throw tut::no_more_tests();
+        return false;
     }
     tr.group = unescape(tr.group);
 
@@ -170,6 +169,7 @@ void deserialize(std::istream& is, tut::test_result& tr)
     {
         throw std::logic_error("malformed test result");
     }
+    return true;
 }
 };
 
@@ -282,16 +282,16 @@ public:
 
                 try
                 {
-                    tut::test_result tr = runner_.run_test(*gni,test);
+                    tut::test_result tr;
+                    if( !runner_.run_test(*gni,test, tr) )
+                    {
+                        break;
+                    }
                     register_test_(tr);
                 }
                 catch (const tut::beyond_last_test&)
                 {
                     break;
-                }
-                catch(const tut::no_such_test&)
-                {
-                    // it's ok
                 }
 
                 ++test;
@@ -320,17 +320,12 @@ private:
         std::ifstream ijournal(jrn_.c_str());
         while (ijournal.good())
         {
-            // read next test result
-            try
-            {
-                tut::test_result tr;
-                util::deserialize(ijournal,tr);
-                runner_.cb_test_completed_(tr);
-            }
-            catch (const no_more_tests&)
+            tut::test_result tr;
+            if( !util::deserialize(ijournal,tr) )
             {
                 break;
             }
+            runner_.cb_test_completed_(tr);
         }
 
         runner_.cb_run_completed_();

@@ -5,10 +5,10 @@ using std::runtime_error;
 
 namespace tut
 {
-    
+
 /**
  * Testing exceptions in setup of test;
- * first run issue an integer 0 exception, 
+ * first run issue an integer 0 exception,
  * second -- std::exception
  */
 struct setup_ex
@@ -48,7 +48,7 @@ struct setup_ex
     typedef tf::object object;
     tf factory;
 
-    setup_ex() 
+    setup_ex()
         : factory("internal", tr)
     {
     }
@@ -66,8 +66,9 @@ template<>
 void object::test<1>()
 {
     set_test_name("checks getting unknown exception in setup");
-    
-    test_result r = tr.run_test("internal", 1);
+
+    test_result r;
+    ensure(tr.run_test("internal", 1, r));
     ensure(r.result == test_result::ex_ctor);
 }
 
@@ -79,8 +80,9 @@ template<>
 void object::test<2>()
 {
     set_test_name("checks getting std exception in setup");
-    
-    test_result r = tr.run_test("internal", 2);
+
+    test_result r;
+    ensure(tr.run_test("internal", 2, r));
     ensure_equals("r.result", r.result, test_result::ex_ctor);
 }
 
@@ -93,8 +95,9 @@ template<>
 void object::test<3>()
 {
     set_test_name("checks getting segfault in setup under OS Windows");
-    
-    test_result r = tr.run_test("internal", 3);
+
+    test_result r;
+    ensure(tr.run_test("internal", 3, r));
     ensure(r.result == test_result::ex_ctor);
 }
 #endif

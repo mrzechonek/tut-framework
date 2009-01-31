@@ -21,10 +21,10 @@ struct group_base
 
     // execute tests iteratively
     virtual void rewind() = 0;
-    virtual test_result run_next() = 0;
+    virtual bool run_next(test_result &) = 0;
 
     // execute one test
-    virtual test_result run_test(int n) = 0;
+    virtual bool run_test(int n, test_result &tr) = 0;
 };
 
 
@@ -205,14 +205,8 @@ public:
         while (i != e)
         {
             cb_group_started_(i->first);
-            try
-            {
-                run_all_tests_in_group_(i);
-            }
-            catch (const no_more_tests&)
-            {
-                cb_group_completed_(i->first);
-            }
+            run_all_tests_in_group_(i);
+            cb_group_completed_(i->first);
 
             ++i;
         }
@@ -235,15 +229,7 @@ public:
         }
 
         cb_group_started_(group_name);
-        try
-        {
-            run_all_tests_in_group_(i);
-        }
-        catch (const no_more_tests&)
-        {
-            // ok
-        }
-
+        run_all_tests_in_group_(i);
         cb_group_completed_(group_name);
         cb_run_completed_();
     }
@@ -251,7 +237,7 @@ public:
     /**
      * Runs one test in specified group.
      */
-    test_result run_test(const std::string& group_name, int n) const
+    bool run_test(const std::string& group_name, int n, test_result &tr) const
     {
         cb_run_started_();
 
@@ -263,26 +249,18 @@ public:
         }
 
         cb_group_started_(group_name);
-        try
+
+        bool t = i->second->run_test(n, tr);
+
+        if(t && tr.result != test_result::dummy)
         {
-            test_result tr = i->second->run_test(n);
             cb_test_completed_(tr);
-            cb_group_completed_(group_name);
-            cb_run_completed_();
-            return tr;
         }
-        catch (const beyond_last_test&)
-        {
-            cb_group_completed_(group_name);
-            cb_run_completed_();
-            throw;
-        }
-        catch (const no_such_test&)
-        {
-            cb_group_completed_(group_name);
-            cb_run_completed_();
-            throw;
-        }
+
+        cb_group_completed_(group_name);
+        cb_run_completed_();
+
+        return t;
     }
 
 protected:
@@ -340,14 +318,19 @@ private:
     void run_all_tests_in_group_(const_iterator i) const
     {
         i->second->rewind();
-        for ( ;; )
+
+        test_result tr;
+        while(i->second->run_next(tr))
         {
-            test_result tr = i->second->run_next();
-            cb_test_completed_(tr);
+            if(tr.result != test_result::dummy)
+            {
+                cb_test_completed_(tr);
+            }
 
             if (tr.result == test_result::ex_ctor)
             {
-                throw no_more_tests();
+                // test object ctor failed, skip whole group
+                break;
             }
         }
     }

@@ -99,13 +99,14 @@ void object::test<1>()
 {
     set_test_name("checks reaping children");
 
-    test_result res = tr.run_test("internal", 1);
+    test_result res;
+    ensure("test exists", tr.run_test("internal", 1, res) );
     ensure("ok", res.result == test_result::ok);
 
     ensure_equals("child count", teardown_reaper::children.size(), size_t(2));
 
     std::set<pid_t>::iterator i;
-    
+
     i = teardown_reaper::children.begin();
     ensure_equals("1. child signal", kill(*i, 0), -1);
     ensure_equals("1. child kill", errno, ESRCH);
@@ -121,7 +122,8 @@ void object::test<2>()
 {
     set_test_name("checks killing children");
 
-    test_result res = tr.run_test("internal", 2);
+    test_result res;
+    ensure("test exists", tr.run_test("internal", 2, res) );
     ensure("warning", res.result == test_result::warn);
 
     ensure_equals("child count", teardown_reaper::children.size(), size_t(3));

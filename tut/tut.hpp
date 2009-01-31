@@ -291,72 +291,59 @@ public:
     /**
      * Runs next test.
      */
-    test_result run_next()
+    bool run_next(test_result &tr)
     {
         if (current_test_ == tests_.end())
         {
-            throw no_more_tests();
+            return false;
         }
 
         // find next user-specialized test
         safe_holder<object> obj;
         while (current_test_ != tests_.end())
         {
-            try
-            {
-                tests_iterator current_test = current_test_++;
+            tests_iterator current_test = current_test_++;
 
-                test_result tr = run_test_(current_test, obj);
-
-                return tr;
-            }
-            catch (const no_such_test&)
+            if(run_test_(current_test, obj, tr) && tr.result != test_result::dummy)
             {
-                continue;
+                return true;
             }
         }
 
-        throw no_more_tests();
+        return false;
     }
 
     /**
      * Runs one test by position.
      */
-    test_result run_test(int n)
+    bool run_test(int n, test_result &tr)
     {
-        // beyond tests is special case to discover upper limit
-        if (tests_.rbegin() == tests_.rend())
+        if (tests_.rbegin() == tests_.rend() ||
+            tests_.rbegin()->first < n)
         {
-            throw beyond_last_test();
-        }
-
-        if (tests_.rbegin()->first < n)
-        {
-            throw beyond_last_test();
+            return false;
         }
 
         // withing scope; check if given test exists
         tests_iterator ti = tests_.find(n);
         if (ti == tests_.end())
         {
-            throw no_such_test();
+            return false;
         }
 
         safe_holder<object> obj;
-        test_result tr = run_test_(ti, obj);
-
-        return tr;
+        return run_test_(ti, obj, tr);
     }
 
     /**
      * VC allows only one exception handling type per function,
      * so I have to split the method.
      */
-    test_result run_test_(const tests_iterator& ti, safe_holder<object>& obj)
+    bool run_test_(const tests_iterator& ti, safe_holder<object>& obj, test_result &tr)
     {
         std::string current_test_name;
 
-        test_result tr(name_, ti->first, current_test_name, test_result::ok);
+        tr = test_result(name_, ti->first, current_test_name, test_result::ok);
 
         try
         {
@@ -364,10 +351,13 @@ public:
             {
                 throw seh("seh");
             }
-        }
-        catch (const no_such_test&)
-        {
-            throw;
+            else
+            {
+                if(obj.get() && obj->called_method_was_a_dummy_test_)
+                {
+                    tr.result = test_result::dummy;
+                }
+            }
         }
         catch (const rethrown& ex)
         {
@@ -404,14 +394,13 @@ public:
             tr.name = current_test_name;
         }
 
-        return tr;
+        return true;
     }
 
     /**
      * Runs one under SEH if platform supports it.
      */
-    bool run_test_seh_(testmethod tm, safe_holder<object>& obj,
-        std::string& current_test_name)
+    bool run_test_seh_(testmethod tm, safe_holder<object>& obj, std::string& current_test_name)
     {
 #if defined(TUT_USE_SEH)
         __try
@@ -443,7 +432,7 @@ public:
         if (obj->called_method_was_a_dummy_test_)
         {
             // do not call obj.release(); reuse object
-            throw no_such_test();
+            return true;
         }
 
         current_test_name = obj->get_test_name();

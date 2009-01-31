@@ -53,7 +53,7 @@ void runtime_ex::object::test<3>()
 }
 #endif
 
-runtime_ex::runtime_ex() 
+runtime_ex::runtime_ex()
     : factory("internal", tr)
 {
 }
@@ -69,8 +69,9 @@ template<>
 void object::test<1>()
 {
     set_test_name("checks getting unknown exception");
-    
-    test_result t = tr.run_test("internal",1);
+
+    test_result t;
+    ensure( tr.run_test("internal",1,t) );
     ensure("got exception", t.result == test_result::ex);
     ensure("got message", t.message == "");
 }
@@ -83,8 +84,9 @@ template<>
 void object::test<2>()
 {
     set_test_name("checks getting std exception");
-    
-    test_result t = tr.run_test("internal", 2);
+
+    test_result t;
+    ensure( tr.run_test("internal",2,t) );
     ensure("got exception", t.result == test_result::ex);
     ensure("got message", t.message == "throwing std exception");
 }
@@ -98,8 +100,9 @@ template<>
 void object::test<3>()
 {
     set_test_name("Checks getting segfault under OS Windows");
-    
-    test_result t = tr.run_test("internal",3);
+
+    test_result t;
+    ensure( tr.run_test("internal",3,t) );
     ensure_equals("got term", t.result, test_result::term);
 }
 #endif
@@ -112,7 +115,7 @@ template<>
 void object::test<4>()
 {
     set_test_name("running all tests");
-    
+
     tr.run_tests("internal");
 }
 

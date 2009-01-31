@@ -2,6 +2,7 @@
 #define TUT_CONSOLE_REPORTER
 
 #include <tut/tut.hpp>
+#include <cassert>
 
 /**
  * Template Unit Tests Framework for C++.
@@ -37,6 +38,8 @@ std::ostream& operator<<(std::ostream& os, const tut::test_result& tr)
     case tut::test_result::rethrown:
         os << '[' << tr.test << "=P]";
         break;
+    case tut::test_result::dummy:
+        assert(!"Should never be called");
     }
 
     return os;
@@ -111,6 +114,8 @@ public:
             case test_result::term:
                 terminations_count++;
                 break;
+            case tut::test_result::dummy:
+                assert(!"Should never be called");
         } // switch
 
         if (tr.result != tut::test_result::ok)

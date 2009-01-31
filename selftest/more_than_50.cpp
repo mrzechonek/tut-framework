@@ -48,7 +48,7 @@ void more_than_50::object::test<55>()
 /**
  * Internal constructor
  */
-more_than_50::more_than_50() 
+more_than_50::more_than_50()
     : factory("internal", tr)
 {
 }
@@ -65,9 +65,12 @@ template<>
 void object::test<1>()
 {
     set_test_name("checks running all (and call 55th test) and then only 1th");
-    
+
     tr.run_tests("internal");
-    ensure_equals("result", tr.run_test("internal",1).result, test_result::ok);
+
+    test_result res;
+    ensure(tr.run_test("internal",1,res));
+    ensure_equals("result", res.result, test_result::ok);
 }
 
 }

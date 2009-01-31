@@ -36,12 +36,12 @@ struct test_name_data
     struct dummy
     {
     };
-    
+
     typedef test_group < dummy > tf;
     typedef tf::object object;
     tf factory;
 
-    test_name_data() 
+    test_name_data()
         : factory("internal", runner)
     {
     }
@@ -109,11 +109,17 @@ template < >
 void set_test_name_tests::test < 1 > ()
 {
     runner.set_callback(&callback);
-    runner.run_test("internal", 1);
+
+    test_result res;
+
+    ensure(runner.run_test("internal", 1, res));
     ensure_equals("test name", callback.current_test_name, "1");
-    runner.run_test("internal", 2);
+
+    ensure(runner.run_test("internal", 2, res));
     ensure_equals("test name", callback.current_test_name, "2");
-    runner.run_test("internal", 3);
+
+    ensure(runner.run_test("internal", 3, res));
+
     ensure_equals("test name", callback.current_test_name, "");
 }
 
@@ -125,7 +131,9 @@ template < >
 void set_test_name_tests::test < 2 > ()
 {
     runner.set_callback(&callback);
-    runner.run_test("internal", 4);
+
+    test_result res;
+    ensure(runner.run_test("internal", 4, res));
     ensure_equals("test name", callback.current_test_name, "failure");
 }
 
@@ -137,7 +145,8 @@ template < >
 void set_test_name_tests::test < 3 > ()
 {
     runner.set_callback(&callback);
-    runner.run_test("internal", 5);
+    test_result res;
+    ensure(runner.run_test("internal", 5, res));
     ensure_equals("test name", callback.current_test_name, "unexpected");
 }
 
@@ -150,7 +159,8 @@ template < >
 void set_test_name_tests::test < 4 > ()
 {
     runner.set_callback(&callback);
-    runner.run_test("internal", 6);
+    test_result res;
+    ensure(runner.run_test("internal", 6, res));
     ensure_equals("test name", callback.current_test_name, "seh");
 }
 #endif // TUT_USE_SEH

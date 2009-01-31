@@ -6,7 +6,7 @@ using std::runtime_error;
 
 namespace tut
 {
-    
+
 /**
  * Testing we can create non-50-tests group.
  */
@@ -49,7 +49,7 @@ void less_than_50::object::test<3>()
 /**
  * Internal constructor
  */
-less_than_50::less_than_50() 
+less_than_50::less_than_50()
     : factory("internal", tr)
 {
 }
@@ -67,9 +67,10 @@ void object::test<1>()
 {
     set_test_name("checks running all (and do not call 3rd test) and then"
         " only 1th.");
-    
-    tr.run_tests("internal");
-    ensure_equals("result", tr.run_test("internal",1).result, test_result::ok);
+
+    test_result res;
+    ensure(tr.run_test("internal",1,res));
+    ensure_equals("result", res.result, test_result::ok);
 }
 
 }

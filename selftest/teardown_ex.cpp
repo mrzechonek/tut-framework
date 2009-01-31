@@ -5,10 +5,10 @@ using std::runtime_error;
 
 namespace tut
 {
-    
+
 /**
  * Testing exceptions in teardown (cleanup) of test;
- * one run issues an integer 0 exception, 
+ * one run issues an integer 0 exception,
  * another -- std::exception.
  */
 struct teardown_ex
@@ -42,7 +42,7 @@ struct teardown_ex
             }
         }
     };
-    
+
     typedef test_group<dummy> tf;
     typedef tf::object object;
     tf factory;
@@ -78,7 +78,7 @@ void teardown_ex::object::test<4>()
     throw tut_error("regular");
 }
 
-teardown_ex::teardown_ex() 
+teardown_ex::teardown_ex()
     : factory("internal", tr)
 {
 }
@@ -95,8 +95,9 @@ template<>
 void object::test<1>()
 {
     set_test_name("checks getting std::exception");
-    
-    test_result res = tr.run_test("internal",1);
+
+    test_result res;
+    ensure( tr.run_test("internal",1,res) );
     ensure("warning", res.result == test_result::warn);
 }
 
@@ -108,8 +109,9 @@ template<>
 void object::test<2>()
 {
     set_test_name("checks getting unknown std::exception");
-    
-    test_result res = tr.run_test("internal",2);
+
+    test_result res;
+    ensure( tr.run_test("internal",2,res) );
     ensure("warning", res.result == test_result::warn);
 }
 
@@ -122,8 +124,9 @@ template<>
 void object::test<3>()
 {
     set_test_name("checks getting unknown C++ exception");
-    
-    test_result res = tr.run_test("internal",3);
+
+    test_result res;
+    ensure( tr.run_test("internal",3,res) );
     ensure_equals("warning", res.result, test_result::warn);
     ensure("warning message", res.message != "ex in destructor");
 }
@@ -137,8 +140,9 @@ template<>
 void object::test<4>()
 {
     set_test_name("checks getting std::exception in runtime");
-    
-    test_result res = tr.run_test("internal",4);
+
+    test_result res;
+    ensure( tr.run_test("internal",4,res) );
     ensure("ex", res.result == test_result::ex);
     ensure("ex message", res.message == "regular");
 }

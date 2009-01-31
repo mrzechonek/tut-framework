@@ -2,7 +2,7 @@
 
 namespace tut
 {
-    
+
 /**
  * Testing each test starts with brand new test object.
  */
@@ -17,7 +17,7 @@ struct setup_new_copy
             counter++;
         };
     };
-    
+
     typedef test_group<dummy> tf;
     typedef tf::object object;
     tf factory;
@@ -39,7 +39,7 @@ void setup_new_copy::object::test<1>()
 /**
  * Internal constructor
  */
-setup_new_copy::setup_new_copy() 
+setup_new_copy::setup_new_copy()
     : factory("internal", tr)
 {
 }
@@ -56,11 +56,12 @@ template<>
 void object::test<1>()
 {
     set_test_name("checks getting unknown exception in setup");
-    
-    tr.run_test("internal",1);
+
+    test_result r;
+    ensure(tr.run_test("internal",1,r));
     ensure_equals("one constructor called", counter, 1);
 
-    tr.run_test("internal",1);
+    ensure(tr.run_test("internal",1,r));
     ensure_equals("another constructor called", counter, 2);
 }
 
