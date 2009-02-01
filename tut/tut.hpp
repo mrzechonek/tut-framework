@@ -128,6 +128,14 @@ class test_group : public group_base, public test_group_posix
     tests tests_;
     tests_iterator current_test_;
 
+	enum seh_result
+	{
+		SEH_OK,
+		SEH_CTOR,
+		SEH_TEST,
+		SEH_DUMMY
+	};
+
     /**
      * Exception-in-destructor-safe smart-pointer class.
      */
@@ -347,17 +355,24 @@ public:
 
         try
         {
-            if (run_test_seh_(ti->second, obj, current_test_name) == false)
-            {
-                throw seh("seh");
-            }
-            else
-            {
-                if(obj.get() && obj->called_method_was_a_dummy_test_)
-                {
-                    tr.result = test_result::dummy;
-                }
-            }
+            switch (run_test_seh_(ti->second, obj, current_test_name))
+			{
+				case SEH_CTOR:
+					throw bad_ctor("seh");
+					break;
+
+				case SEH_TEST:
+					throw seh("seh");
+					break;
+
+				case SEH_DUMMY:
+					tr.result = test_result::dummy;
+					break;
+
+				case SEH_OK:
+					// ok
+					break;
+            }            
         }
         catch (const rethrown& ex)
         {
@@ -400,7 +415,7 @@ public:
     /**
      * Runs one under SEH if platform supports it.
      */
-    bool run_test_seh_(testmethod tm, safe_holder<object>& obj, std::string& current_test_name)
+    seh_result run_test_seh_(testmethod tm, safe_holder<object>& obj, std::string& current_test_name)
     {
 #if defined(TUT_USE_SEH)
         __try
@@ -423,16 +438,15 @@ public:
             }
             __except(handle_seh_(::GetExceptionCode()))
             {
-                // throw seh("SEH");
                 current_test_name = obj->get_test_name();
-                return false;
+                return SEH_TEST;
             }
 #endif
 
         if (obj->called_method_was_a_dummy_test_)
         {
             // do not call obj.release(); reuse object
-            return true;
+            return SEH_DUMMY;
         }
 
         current_test_name = obj->get_test_name();
@@ -442,10 +456,10 @@ public:
         }
         __except(handle_seh_(::GetExceptionCode()))
         {
-            return false;
+			return SEH_CTOR;            
         }
 #endif
-        return true;
+        return SEH_OK;
     }
 
     void reset_holder_(safe_holder<object>& obj)
