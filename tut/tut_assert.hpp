@@ -13,6 +13,24 @@
 namespace tut
 {
 
+    namespace detail
+    {
+        template<typename M>
+        std::ostream &msg_prefix(std::ostream &str, const M &msg)
+        {
+            std::stringstream ss;
+            ss << msg;
+
+            if(!ss.str().empty())
+            {
+                str << ss.rdbuf() << ": ";
+            }
+
+            return str;
+        }
+    }
+
+
 namespace
 {
 
@@ -74,8 +92,8 @@ void ensure_equals(const M& msg, const LHS& actual, const RHS& expected)
     if (expected != actual)
     {
         std::stringstream ss;
-        ss << msg << ":"
-           << " expected '"
+        detail::msg_prefix(ss,msg)
+           << "expected '"
            << expected
            << "' actual '"
            << actual
@@ -99,7 +117,7 @@ void ensure_equals(const M& msg, const double& actual, const double& expected,
     if ( !((diff <= epsilon) && (diff >= -epsilon )) )
     {
         std::stringstream ss;
-        ss << msg << ":"
+        detail::msg_prefix(ss,msg)
            << std::scientific
            << std::showpoint
            << std::setprecision(16)
@@ -126,8 +144,7 @@ void ensure_distance(const M& msg, const T& actual, const T& expected, const T& 
     if (expected-distance >= actual || expected+distance <= actual)
     {
         std::stringstream ss;
-        ss << (msg ? msg : "")
-            << (msg? ":" : "")
+        detail::msg_prefix(ss,msg)
             << " expected ("
             << expected-distance
             << " - "
@@ -153,7 +170,7 @@ void ensure_errno(const M& msg, bool cond)
 #if defined(TUT_USE_POSIX)
         char e[512];
         std::stringstream ss;
-        ss << msg << ":"
+        detail::msg_prefix(ss,msg)
            << strerror_r(errno, e, sizeof(e));
         throw failure(ss.str());
 #else
