@@ -5,7 +5,7 @@ OBJS=main$(OFX) ensure_fork${OFX} teardown_reaper${OFX} runner$(OFX) setup_ex$(O
      ensure_equals$(OFX) ensure_distance$(OFX) runtime_exceptions$(OFX) \
      more_than_50$(OFX) less_than_50$(OFX) same_object_for_dummy$(OFX) \
      reporter$(OFX) outside$(OFX) ctor_ex$(OFX) constructed_instances$(OFX) \
-     bug_ensure_0_equals_0$(OFX) set_test_name$(OFX) ensure_not$(OFX)
+     bug_ensure_0_equals_0$(OFX) set_test_name$(OFX) ensure_not$(OFX) test_id$(OFX)
 
 
 HEADERS=../tut/tut.hpp
@@ -90,3 +90,6 @@ ensure_fork$(OFX) : ensure_fork.cpp $(HEADERS)
 
 teardown_reaper$(OFX) : teardown_reaper.cpp $(HEADERS)
 	$(CXX) $(CXXOPTS)teardown_reaper$(OFX) teardown_reaper.cpp 
+
+test_id$(OFX) : test_id.cpp $(HEADERS)
+	$(CXX) $(CXXOPTS)test_id$(OFX) test_id.cpp 

@@ -62,6 +62,16 @@ public:
         return current_test_name_;
     }
 
+    void set_test_id(int current_test_id)
+    {
+        current_test_id_ = current_test_id;
+    }
+
+    int get_test_id() const
+    {
+        return current_test_id_;
+    }
+
     /**
      * Default do-nothing test.
      */
@@ -81,6 +91,7 @@ public:
     bool called_method_was_a_dummy_test_;
 
 private:
+    int             current_test_id_;
     std::string     current_test_name_;
 };
 
@@ -355,7 +366,7 @@ public:
 
         try
         {
-            switch (run_test_seh_(ti->second, obj, current_test_name))
+            switch (run_test_seh_(ti->second, obj, current_test_name, ti->first))
 			{
 				case SEH_CTOR:
 					throw bad_ctor("seh");
@@ -372,7 +383,7 @@ public:
 				case SEH_OK:
 					// ok
 					break;
-            }            
+            }
         }
         catch (const rethrown& ex)
         {
@@ -415,7 +426,8 @@ public:
     /**
      * Runs one under SEH if platform supports it.
      */
-    seh_result run_test_seh_(testmethod tm, safe_holder<object>& obj, std::string& current_test_name)
+    seh_result run_test_seh_(testmethod tm, safe_holder<object>& obj,
+                             std::string& current_test_name, int current_test_id)
     {
 #if defined(TUT_USE_SEH)
         __try
@@ -433,6 +445,7 @@ public:
             __try
             {
 #endif
+                obj.get()->set_test_id(current_test_id);
                 (obj.get()->*tm)();
 #if defined(TUT_USE_SEH)
             }
@@ -456,7 +469,7 @@ public:
         }
         __except(handle_seh_(::GetExceptionCode()))
         {
-			return SEH_CTOR;            
+			return SEH_CTOR;
         }
 #endif
         return SEH_OK;
