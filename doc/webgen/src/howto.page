@@ -34,7 +34,7 @@ Creating a test group
 To begin we need to create a new source file for our test group. Let's call it test.cpp:
 
 {coderay:: c}
-#include <tut.h> 
+#include <tut/tut.hpp> 
 namespace tut 
 { 
     struct data // (1)
@@ -66,7 +66,7 @@ You can provide an optional name to the test by calling set\_test\_name() method
 {coderay:: c}
 #include <my_set.h>     
     
-#include <tut.h> 
+#include <tut/tut.hpp> 
 namespace tut 
 { 
     struct data //
@@ -106,7 +106,7 @@ Finally, the main module of the test application
 ------------------------------------------------
 
 {coderay:: c}
-#include <tut.h>
+#include <tut/tut.hpp>
 #include <tut_reporter.h>
 #include <iostream>
 

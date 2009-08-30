@@ -330,7 +330,7 @@ public:
                 } // switch
 
 #if defined(TUT_USE_POSIX)
-                out << xml_build_testcase(*tri, failure_type, failure_msg, tr.pid) << endl;
+                out << xml_build_testcase(*tri, failure_type, failure_msg, (*tri).pid) << endl;
 #else
                 out << xml_build_testcase(*tri, failure_type, failure_msg) << endl;
 #endif
