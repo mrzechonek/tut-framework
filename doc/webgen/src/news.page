@@ -3,6 +3,10 @@ title: News
 desc: changelog, releases and whatnot
 ---
 
+TUT-2009-08-30
+--------------
+This is a bugfix release.
+
 TUT-2008-11-30
 --------------
 Introduces a whole new feature of multi-process testing. This includes forking, reporting
