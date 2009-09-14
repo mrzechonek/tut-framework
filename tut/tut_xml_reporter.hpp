@@ -235,6 +235,8 @@ public:
             case test_result::term:
                 terminations_count++;
                 break;
+            case tut::test_result::dummy:
+                assert(!"Should never be called");
         } // switch
 
         // add test result to results table
