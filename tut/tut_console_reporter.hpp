@@ -38,6 +38,9 @@ std::ostream& operator<<(std::ostream& os, const tut::test_result& tr)
     case tut::test_result::rethrown:
         os << '[' << tr.test << "=P]";
         break;
+    case tut::test_result::skipped:
+        os << '[' << tr.test << "=S]";
+        break;
     case tut::test_result::dummy:
         assert(!"Should never be called");
     }
@@ -98,6 +101,7 @@ public:
         // update global statistics
         switch (tr.result) {
             case test_result::ok:
+            case test_result::skipped:
                 ok_count++;
                 break;
             case test_result::fail:
@@ -118,7 +122,8 @@ public:
                 assert(!"Should never be called");
         } // switch
 
-        if (tr.result != tut::test_result::ok)
+        if ( (tr.result != tut::test_result::ok) &&
+             (tr.result != tut::test_result::skipped) )
         {
             not_passed.push_back(tr);
         }
@@ -218,7 +223,7 @@ public:
         os << std::endl;
     }
 
-    bool all_ok() const
+    virtual bool all_ok() const
     {
         return not_passed.empty();
     }

@@ -20,6 +20,7 @@ namespace tut
     void object::test<1>()
     {
         set_test_name("foo");
+        skip();
     }
 
 
@@ -30,10 +31,12 @@ int main()
 {
     using namespace std;
     tut::console_reporter reporter;
+    tut::xml_reporter reporter;
+    tut::callback *callback = &reporter;
 
     try
     {
-        tut::runner.get().set_callback(&reporter);
+        tut::runner.get().set_callback(callback);
         tut::runner.get().run_tests();
     }
     catch (const std::exception& ex)
@@ -47,5 +50,5 @@ int main()
         return 1;
     }
 
-    return !reporter.all_ok();
+    return !callback->all_ok();
 }

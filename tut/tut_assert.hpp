@@ -193,6 +193,20 @@ void fail(const M& msg)
     throw failure(msg);
 }
 
+/**
+ * Mark test case as known failure and skip execution.
+ */
+void skip(const char* msg = "")
+{
+    throw skipped(msg);
+}
+
+template<typename M>
+void skip(const M& msg)
+{
+    throw skipped(msg);
+}
+
 } // end of namespace
 
 }

@@ -78,9 +78,13 @@ public:
 
     void test_completed(const tut::test_result& tr)
     {
-        if (tr.result == test_result::ok) {
+        if ( (tr.result == test_result::ok) ||
+             (tr.result == test_result::skipped) )
+        {
             passed_tests.push_back(tr);
-        } else {
+        }
+        else
+        {
             failed_tests.push_back(tr);
         }
     }
@@ -187,7 +191,7 @@ public:
         xmlfile.close();
     }
 
-    bool all_ok() const
+    virtual bool all_ok() const
     {
         return failed_tests.empty();
     };

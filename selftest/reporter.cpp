@@ -17,13 +17,15 @@ struct reporter_test
     test_result tr3;
     test_result tr4;
     test_result tr5;
+    test_result tr6;
 
     reporter_test()
         : tr1("foo", 1, "", test_result::ok),
           tr2("foo", 2, "", test_result::fail),
           tr3("foo", 3, "", test_result::ex),
           tr4("foo", 4, "", test_result::warn),
-          tr5("foo", 5, "", test_result::term)
+          tr5("foo", 5, "", test_result::term),
+          tr6("foo", 6, "", test_result::skipped)
     {
     }
 };
@@ -37,8 +39,8 @@ template<>
 void object::test<1>()
 {
     stringstream ss;
-    ss << tr1 << tr2 << tr3 << tr4 << tr5;
-    ensure_equals("operator << formatter", ss.str(), ".[2=F][3=X][4=W][5=T]");
+    ss << tr1 << tr2 << tr3 << tr4 << tr5 << tr6;
+    ensure_equals("operator << formatter", ss.str(), ".[2=F][3=X][4=W][5=T][6=S]");
 }
 
 template<>
@@ -70,8 +72,14 @@ void object::test<2>()
     repo.test_completed(tr5);
     repo.test_completed(tr5);
     repo.test_completed(tr5);
+    repo.test_completed(tr6);
+    repo.test_completed(tr6);
+    repo.test_completed(tr6);
+    repo.test_completed(tr6);
+    repo.test_completed(tr6);
+    repo.test_completed(tr6);
 
-    ensure_equals("ok count", repo.ok_count, 1);
+    ensure_equals("ok count", repo.ok_count, 1+6); // 'skipped' means 'ok'
     ensure_equals("fail count", repo.failures_count, 2);
     ensure_equals("ex count", repo.exceptions_count, 3);
     ensure_equals("warn count", repo.warnings_count, 4);
@@ -126,6 +134,11 @@ void object::test<4>()
     repo.test_completed(tr5);
     repo.test_completed(tr1);
     ensure(!repo.all_ok());
+
+    repo.run_started();
+    repo.test_completed(tr1);
+    repo.test_completed(tr6);
+    ensure(repo.all_ok());
 }
 
 }

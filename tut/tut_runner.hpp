@@ -88,6 +88,11 @@ struct callback
     virtual void run_completed()
     {
     }
+
+    virtual bool all_ok() const
+    {
+        return true;
+    }
 private:
     callback(const callback &);
     void operator=(const callback&);

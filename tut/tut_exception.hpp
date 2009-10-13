@@ -12,7 +12,7 @@ namespace tut
  */
 struct tut_error : public std::exception
 {
-    tut_error(const std::string& msg)
+    explicit tut_error(const std::string& msg)
         : err_msg(msg)
     {
     }
@@ -41,7 +41,7 @@ private:
  */
 struct no_such_group : public tut_error
 {
-    no_such_group(const std::string& grp)
+    explicit no_such_group(const std::string& grp)
         : tut_error(grp)
     {
     }
@@ -57,7 +57,7 @@ struct no_such_group : public tut_error
  */
 struct bad_ctor : public tut_error
 {
-    bad_ctor(const std::string& msg)
+    explicit bad_ctor(const std::string& msg)
         : tut_error(msg)
     {
     }
@@ -77,7 +77,7 @@ struct bad_ctor : public tut_error
  */
 struct failure : public tut_error
 {
-    failure(const std::string& msg)
+    explicit failure(const std::string& msg)
         : tut_error(msg)
     {
     }
@@ -97,7 +97,7 @@ struct failure : public tut_error
  */
 struct warning : public tut_error
 {
-    warning(const std::string& msg)
+    explicit warning(const std::string& msg)
         : tut_error(msg)
     {
     }
@@ -117,7 +117,7 @@ struct warning : public tut_error
  */
 struct seh : public tut_error
 {
-    seh(const std::string& msg)
+    explicit seh(const std::string& msg)
         : tut_error(msg)
     {
     }
@@ -152,6 +152,23 @@ struct rethrown : public failure
     }
 
     const test_result tr;
+};
+
+struct skipped : public tut_error
+{
+    explicit skipped(const std::string& msg)
+        : tut_error(msg)
+    {
+    }
+
+    virtual test_result::result_type result() const
+    {
+        return test_result::skipped;
+    }
+
+    ~skipped() throw()
+    {
+    }
 };
 
 }

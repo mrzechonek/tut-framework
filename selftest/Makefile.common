@@ -1,7 +1,7 @@
 TGT=selftest$(SFX)
 
 OBJS=main$(OFX) ensure_fork${OFX} teardown_reaper${OFX} runner$(OFX) setup_ex$(OFX) setup_new_copy$(OFX) \
-     teardown_ex$(OFX) callback$(OFX) ensure$(OFX) fail$(OFX) \
+     teardown_ex$(OFX) callback$(OFX) ensure$(OFX) fail$(OFX) skip${OFX} \
      ensure_equals$(OFX) ensure_distance$(OFX) runtime_exceptions$(OFX) \
      more_than_50$(OFX) less_than_50$(OFX) same_object_for_dummy$(OFX) \
      reporter$(OFX) outside$(OFX) ctor_ex$(OFX) constructed_instances$(OFX) \
@@ -51,6 +51,9 @@ ensure_distance$(OFX) : ensure_distance.cpp $(HEADERS)
 
 fail$(OFX) : fail.cpp $(HEADERS)
 	$(CXX) $(CXXOPTS)fail$(OFX) fail.cpp 
+
+skip$(OFX) : skip.cpp $(HEADERS)
+	$(CXX) $(CXXOPTS)skip$(OFX) skip.cpp 
 
 ctor_ex$(OFX) : ctor_ex.cpp $(HEADERS)
 	$(CXX) $(CXXOPTS)ctor_ex$(OFX) ctor_ex.cpp 

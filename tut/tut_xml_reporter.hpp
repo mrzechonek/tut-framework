@@ -99,7 +99,8 @@ protected:
 
         std::ostringstream out;
 
-        if (tr.result == test_result::ok)
+        if ( (tr.result == test_result::ok) ||
+             (tr.result == test_result::skipped) )
         {
             out << "  <testcase classname=\"" << encode(tr.group) << "\" name=\"" << encode(tr.name) << "\" />";
         }

@@ -61,6 +61,7 @@ struct test_result : public test_result_posix
         term,
         ex_ctor,
         rethrown,
+        skipped,
         dummy
     };
 
