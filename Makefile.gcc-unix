@@ -1,8 +1,14 @@
 CXX=g++
-CXXOPTS=-ftemplate-depth-100 -I$(TUT) -Wall -O2 -c -o
+CXXOPTS=-ftemplate-depth-100 -I$(TUT) -Wall -O2 -c
+ifdef DEBUG
+CXXOPTS+= -g
+endif
+CXXOPTS+= -o
 LNK=g++
 LNKOPTS=-o
 SFX=_gcc_unix
 OFX=.o
 RM=rm -f
+
+
 

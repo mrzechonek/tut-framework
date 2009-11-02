@@ -1,5 +1,6 @@
 #include <tut/tut.hpp>
 #include <tut/tut_console_reporter.hpp>
+#include <tut/tut_xml_reporter.hpp>
 
 #include <exception>
 #include <iostream>
@@ -31,7 +32,7 @@ int main()
 {
     using namespace std;
     tut::console_reporter reporter;
-    tut::xml_reporter reporter;
+    tut::xml_reporter xml_reporter;
     tut::callback *callback = &reporter;
 
     try

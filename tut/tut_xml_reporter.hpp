@@ -220,6 +220,7 @@ public:
         // update global statistics
         switch (tr.result) {
             case test_result::ok:
+            case test_result::skipped:
                 ok_count++;
                 break;
             case test_result::fail:
