@@ -49,6 +49,9 @@ public:
      * Default constructor
      */
     test_object()
+        : called_method_was_a_dummy_test_(true),
+          current_test_id_(0),
+          current_test_name_()
     {
     }
 
@@ -90,6 +93,10 @@ public:
      */
     bool called_method_was_a_dummy_test_;
 
+    virtual ~test_object()
+    {
+    }
+
 private:
     int             current_test_id_;
     std::string     current_test_name_;
@@ -126,6 +133,9 @@ struct tests_registerer<Test, Group, 0>
 template <class Data, int MaxTestsInGroup = 50>
 class test_group : public group_base, public test_group_posix
 {
+    test_group(const test_group&);
+    void operator=(const test_group&);
+
     const char* name_;
 
     typedef void (test_object<Data>::*testmethod)();
@@ -139,13 +149,13 @@ class test_group : public group_base, public test_group_posix
     tests tests_;
     tests_iterator current_test_;
 
-	enum seh_result
-	{
-		SEH_OK,
-		SEH_CTOR,
-		SEH_TEST,
-		SEH_DUMMY
-	};
+    enum seh_result
+    {
+        SEH_OK,
+        SEH_CTOR,
+        SEH_TEST,
+        SEH_DUMMY
+    };
 
     /**
      * Exception-in-destructor-safe smart-pointer class.
@@ -268,7 +278,9 @@ public:
      * Creates and registers test group with specified name.
      */
     test_group(const char* name)
-        : name_(name)
+        : name_(name),
+          tests_(),
+          current_test_()
     {
         // register itself
         runner.get().register_group(name_,this);
@@ -281,7 +293,9 @@ public:
      * This constructor is used in self-test run only.
      */
     test_group(const char* name, test_runner& another_runner)
-        : name_(name)
+        : name_(name),
+          tests_(),
+          current_test_()
     {
         // register itself
         another_runner.register_group(name_, this);
@@ -367,22 +381,22 @@ public:
         try
         {
             switch (run_test_seh_(ti->second, obj, current_test_name, ti->first))
-			{
-				case SEH_CTOR:
-					throw bad_ctor("seh");
-					break;
+            {
+                case SEH_CTOR:
+                    throw bad_ctor("seh");
+                    break;
 
-				case SEH_TEST:
-					throw seh("seh");
-					break;
+                case SEH_TEST:
+                    throw seh("seh");
+                    break;
 
-				case SEH_DUMMY:
-					tr.result = test_result::dummy;
-					break;
+                case SEH_DUMMY:
+                    tr.result = test_result::dummy;
+                    break;
 
-				case SEH_OK:
-					// ok
-					break;
+                case SEH_OK:
+                    // ok
+                    break;
             }
         }
         catch (const rethrown& ex)
@@ -469,7 +483,7 @@ public:
         }
         __except(handle_seh_(::GetExceptionCode()))
         {
-			return SEH_CTOR;
+            return SEH_CTOR;
         }
 #endif
         return SEH_OK;

@@ -32,8 +32,9 @@ struct tut_error : public std::exception
     }
 
 private:
+    void operator=(const tut_error &);
 
-    std::string err_msg;
+    const std::string err_msg;
 };
 
 /**
@@ -151,7 +152,7 @@ struct rethrown : public failure
     {
     }
 
-    const test_result tr;
+    test_result tr;
 };
 
 struct skipped : public tut_error

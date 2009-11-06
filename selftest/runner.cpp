@@ -8,6 +8,9 @@ struct runner_data
     test_runner tr;
     struct dummy
     {
+        virtual ~dummy()
+        {
+        }
     };
 
     typedef test_group<dummy> tf;
@@ -31,6 +34,10 @@ struct runner_data
     } callback;
 
     runner_data();
+
+    virtual ~runner_data()
+    {
+    }
 };
 
 template<>
@@ -40,7 +47,9 @@ void runner_data::object::test<1>()
 }
 
 runner_data::runner_data()
-    : factory("runner_internal", tr)
+    : tr(),
+      factory("runner_internal", tr),
+      callback()
 {
 }
 

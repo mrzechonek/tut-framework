@@ -16,7 +16,7 @@ struct teardown_ex
     test_runner tr;
     struct dummy
     {
-        ~dummy()
+        virtual ~dummy()
         {
             static int n = 0;
 #if defined(TUT_USE_SEH)
@@ -48,6 +48,10 @@ struct teardown_ex
     tf factory;
 
     teardown_ex();
+
+    virtual ~teardown_ex()
+    {
+    }
 };
 
 /**
@@ -79,7 +83,8 @@ void teardown_ex::object::test<4>()
 }
 
 teardown_ex::teardown_ex()
-    : factory("internal", tr)
+    : tr(),
+      factory("internal", tr)
 {
 }
 

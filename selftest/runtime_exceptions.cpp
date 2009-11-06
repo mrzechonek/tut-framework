@@ -14,6 +14,9 @@ struct runtime_ex
     test_runner tr;
     struct dummy
     {
+        virtual ~dummy()
+        {
+        }
     };
 
     typedef test_group<dummy> tf;
@@ -21,6 +24,10 @@ struct runtime_ex
     tf factory;
 
     runtime_ex();
+
+    virtual ~runtime_ex()
+    {
+    }
 };
 
 typedef test_group<runtime_ex> tf;
@@ -54,7 +61,8 @@ void runtime_ex::object::test<3>()
 #endif
 
 runtime_ex::runtime_ex()
-    : factory("internal", tr)
+    : tr(),
+      factory("internal", tr)
 {
 }
 

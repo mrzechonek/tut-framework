@@ -15,7 +15,11 @@ struct setup_new_copy
         dummy()
         {
             counter++;
-        };
+        }
+
+        virtual ~dummy()
+        {
+        }
     };
 
     typedef test_group<dummy> tf;
@@ -23,6 +27,10 @@ struct setup_new_copy
     tf factory;
 
     setup_new_copy();
+
+    virtual ~setup_new_copy()
+    {
+    }
 };
 
 int setup_new_copy::counter = 0;
@@ -40,7 +48,8 @@ void setup_new_copy::object::test<1>()
  * Internal constructor
  */
 setup_new_copy::setup_new_copy()
-    : factory("internal", tr)
+    : tr(),
+      factory("internal", tr)
 {
 }
 

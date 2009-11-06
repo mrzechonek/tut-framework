@@ -169,6 +169,13 @@ public:
      * @see setFilenameBase
      */
     xml_reporter(const std::string & _filename = "")
+        : all_tests(),
+          filename(),
+          ok_count(0),
+          exceptions_count(0),
+          failures_count(0),
+          terminations_count(0),
+          warnings_count(0)
     {
         init();
         setFilenameBase(_filename);

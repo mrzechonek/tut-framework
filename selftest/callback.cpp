@@ -24,20 +24,23 @@ struct callback_test
     test_runner tr;
     struct dummy
     {
+        virtual ~dummy()
+        {
+        }
     };
-    
+
     typedef test_group<dummy> tf;
     typedef tf::object object;
     tf factory;
     tf factory2;
 
-    enum event 
-    { 
+    enum event
+    {
         RUN_STARTED = 100,
         GROUP_STARTED,
         GROUP_COMPLETED,
         TEST_COMPLETED,
-        RUN_COMPLETED 
+        RUN_COMPLETED
     };
 
     struct chk_callback : public tut::callback
@@ -67,7 +70,7 @@ struct callback_test
             string current_group = ct.grps[ct.grps.size()-1];
             if( name != current_group )
             {
-                throw runtime_error("group_completed: group mismatch: " + 
+                throw runtime_error("group_completed: group mismatch: " +
                     name + " vs " + current_group);
             }
             ct.called.push_back(GROUP_COMPLETED);
@@ -83,7 +86,7 @@ struct callback_test
             string current_group = ct.grps[ct.grps.size() - 1];
             if( tr.group != current_group )
             {
-                throw runtime_error("test_completed: group mismatch: " + 
+                throw runtime_error("test_completed: group mismatch: " +
                     tr.group + " vs " + current_group);
             }
             ct.called.push_back(TEST_COMPLETED);
@@ -97,6 +100,10 @@ struct callback_test
     } callback;
 
     callback_test();
+
+    virtual ~callback_test()
+    {
+    }
 };
 
 // ==================================
@@ -116,8 +123,12 @@ void callback_test::object::test<3>()
     throw std::runtime_error("an error");
 }
 
-callback_test::callback_test() :
-        factory("internal",tr),factory2("0copy",tr), callback(*this)
+callback_test::callback_test()
+    : called(0),
+      grps(),
+      msg(),
+      tr(),
+      factory("internal",tr),factory2("0copy",tr), callback(*this)
 {}
 
 // ==================================
@@ -135,7 +146,7 @@ template<>
 void object::test<1>()
 {
     set_test_name("running one test which finished ok");
-    
+
     tr.set_callback(&callback);
     test_result res;
     ensure(tr.run_test("internal", 1, res));
@@ -158,7 +169,7 @@ template<>
 void object::test<2>()
 {
     set_test_name("running one test throwing exception");
-    
+
     tr.set_callback(&callback);
     test_result res;
     ensure(tr.run_test("internal", 3, res));
@@ -181,7 +192,7 @@ template<>
 void object::test<3>()
 {
     set_test_name("running all tests in one group");
-    
+
     tr.set_callback(&callback);
     tr.run_tests("internal");
     ensure_equals("0", called[0], RUN_STARTED);
@@ -203,7 +214,7 @@ template<>
 void object::test<4>()
 {
     set_test_name("running all tests in non-existing group");
-    
+
     tr.set_callback(&callback);
     try
     {
@@ -227,7 +238,7 @@ template<>
 void object::test<5>()
 {
     set_test_name("running all tests in all groups");
-    
+
     tr.set_callback(&callback);
     tr.run_tests();
     ensure_equals("0", called[0], RUN_STARTED);
@@ -255,7 +266,7 @@ template<>
 void object::test<6>()
 {
     set_test_name("running one test which doesn't exist");
-    
+
     tr.set_callback(&callback);
 
     try

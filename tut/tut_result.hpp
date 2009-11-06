@@ -14,11 +14,18 @@ struct test_result_posix
     {
     }
 
+    virtual ~test_result_posix()
+    {
+    }
+
     pid_t pid;
 };
 #else
 struct test_result_posix
 {
+    virtual ~test_result_posix()
+    {
+    }
 };
 #endif
 
@@ -77,8 +84,12 @@ struct test_result : public test_result_posix
      * Default constructor.
      */
     test_result()
-        : test(0),
-          result(ok)
+        : group(),
+          test(0),
+          name(),
+          result(ok),
+          message(),
+          exception_typeid()
     {
     }
 
@@ -90,7 +101,9 @@ struct test_result : public test_result_posix
         : group(grp),
           test(pos),
           name(test_name),
-          result(res)
+          result(res),
+          message(),
+          exception_typeid()
     {
     }
 
@@ -121,6 +134,10 @@ struct test_result : public test_result_posix
           result(res),
           message(msg),
           exception_typeid(ex_typeid)
+    {
+    }
+
+    virtual ~test_result()
     {
     }
 };

@@ -1,5 +1,5 @@
 CXX=g++
-CXXOPTS=-ftemplate-depth-100 -I$(TUT) -Wall -O2 -c
+CXXOPTS=-ftemplate-depth-100 -I$(TUT) -DTUT_USE_POSIX -Wall -Weffc++ -Werror -ansi -O2 -c
 ifdef DEBUG
 CXXOPTS+= -g
 endif

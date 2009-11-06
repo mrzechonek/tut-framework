@@ -2,9 +2,6 @@
 #include <string>
 #include <stdexcept>
 
-using std::string;
-using std::runtime_error;
-
 namespace tut
 {
 
@@ -13,6 +10,9 @@ namespace tut
  */
 struct skip_test
 {
+    virtual ~skip_test()
+    {
+    }
 };
 
 typedef test_group<skip_test> tf;
@@ -28,13 +28,13 @@ void object::test<1>()
     try
     {
         skip("A Fail");
-        throw runtime_error("skip doesn't work");
+        throw std::runtime_error("skip doesn't work");
     }
     catch (const skipped& ex)
     {
-        if (string(ex.what()).find("A Fail") == string::npos )
+        if (std::string(ex.what()).find("A Fail") == std::string::npos )
         {
-            throw runtime_error("skip doesn't contain proper message");
+            throw std::runtime_error("skip doesn't contain proper message");
         }
     }
 }
@@ -48,7 +48,7 @@ void object::test<2>()
     try
     {
         skip();
-        throw runtime_error("skip doesn't work");
+        throw std::runtime_error("skip doesn't work");
     }
     catch (const skipped&)
     {

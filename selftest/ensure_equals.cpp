@@ -13,6 +13,9 @@ namespace tut
  */
 struct ensure_eq_test
 {
+    virtual ~ensure_eq_test()
+    {
+    }
 };
 
 typedef test_group<ensure_eq_test> tf;

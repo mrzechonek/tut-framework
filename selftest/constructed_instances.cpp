@@ -17,13 +17,21 @@ struct constructed_instances
         dummy()
         {
             constructed++;
-        };
+        }
+
+        virtual ~dummy()
+        {
+        }
     };
     typedef test_group<dummy,3> tf;
     typedef tf::object object;
     tf factory;
 
     constructed_instances();
+
+    virtual ~constructed_instances()
+    {
+    }
 };
 
 int constructed_instances::dummy::constructed = 0;
@@ -46,8 +54,9 @@ void constructed_instances::object::test<3>()
 /**
  * Internal constructor
  */
-constructed_instances::constructed_instances() 
-    : factory("internal", tr)
+constructed_instances::constructed_instances()
+    : tr(),
+      factory("internal", tr)
 {
 }
 
@@ -63,7 +72,7 @@ template<>
 void object::test<1>()
 {
     set_test_name("checks two and only two instances were created");
-    
+
     tr.run_tests("internal");
     ensure_equals("result", constructed_instances::dummy::constructed, 2);
 }

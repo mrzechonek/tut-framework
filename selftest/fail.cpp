@@ -7,12 +7,15 @@ using std::runtime_error;
 
 namespace tut
 {
-    
+
 /**
  * Testing fail() method.
  */
 struct fail_test
 {
+    virtual ~fail_test()
+    {
+    }
 };
 
 typedef test_group<fail_test> tf;
@@ -24,7 +27,7 @@ template<>
 void object::test<1>()
 {
     set_test_name("checks fail with message");
-    
+
     try
     {
         fail("A Fail");
@@ -44,7 +47,7 @@ template<>
 void object::test<2>()
 {
     set_test_name("checks fail without message");
-    
+
     try
     {
         fail();

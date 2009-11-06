@@ -28,6 +28,10 @@ struct reporter_test
           tr6("foo", 6, "", test_result::skipped)
     {
     }
+
+    virtual ~reporter_test()
+    {
+    }
 };
 
 typedef test_group<reporter_test> tg;

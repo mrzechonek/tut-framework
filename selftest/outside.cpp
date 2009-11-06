@@ -57,6 +57,9 @@ static void foo()
  */
 struct outside_test
 {
+    virtual ~outside_test()
+    {
+    }
 };
 
 typedef test_group<outside_test> tf;

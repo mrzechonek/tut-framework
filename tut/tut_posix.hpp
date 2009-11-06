@@ -57,6 +57,10 @@ private:
             ensure_errno("write() failed", w == size);
         }
     }
+
+    virtual ~test_group_posix()
+    {
+    }
 };
 
 template<typename T>
@@ -126,7 +130,8 @@ public:
      * Default constructor
      */
     test_object_posix()
-        : pipe_(-1)
+        : pids_(),
+          pipe_(-1)
     {
     }
 
@@ -453,12 +458,19 @@ namespace tut
 
 struct test_object_posix
 {
+    virtual ~test_object_posix()
+    {
+    }
 };
 
 struct test_group_posix
 {
     template<typename T>
     void send_result_(const T*, const test_result &)
+    {
+    }
+
+    virtual ~test_group_posix()
     {
     }
 };

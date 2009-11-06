@@ -10,6 +10,9 @@ namespace tut
 
     struct test
     {
+        virtual ~test()
+        {
+        }
     };
 
     typedef test_group<test> tf;

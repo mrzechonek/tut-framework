@@ -116,6 +116,8 @@ public:
      * Constructor
      */
     test_runner()
+        : groups_(),
+          callbacks_()
     {
     }
 

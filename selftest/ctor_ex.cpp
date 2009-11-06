@@ -40,6 +40,10 @@ struct ctor_ex
         {
             throw runtime_error("dummy has throwed an exception");
         }
+
+        virtual ~dummy()
+        {
+        }
     };
 
     typedef test_group<dummy> tf;
@@ -47,7 +51,12 @@ struct ctor_ex
     tf factory;
 
     ctor_ex()
-        : factory("internal", tr)
+        : tr(),
+          factory("internal", tr)
+    {
+    }
+
+    virtual ~ctor_ex()
     {
     }
 }
@@ -66,6 +75,10 @@ struct ctor_ex2
                 throw runtime_error("dummy has throwed an exception");
             }
         }
+
+        virtual ~dummy()
+        {
+        }
     };
 
     typedef test_group<dummy> tf;
@@ -73,7 +86,12 @@ struct ctor_ex2
     tf factory;
 
     ctor_ex2()
-        : factory("internal 2", tr)
+        : tr(),
+          factory("internal 2", tr)
+    {
+    }
+
+    virtual ~ctor_ex2()
     {
     }
 };
@@ -110,7 +128,12 @@ struct ctor_ex_posix
     tf factory;
 
     ctor_ex_posix()
-        : factory("internal posix", tr)
+        : tr(),
+          factory("internal posix", tr)
+    {
+    }
+
+    virtual ~ctor_ex_posix()
     {
     }
 };

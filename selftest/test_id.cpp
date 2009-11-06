@@ -7,6 +7,9 @@ namespace tut
    */
   struct id_test
   {
+      virtual ~id_test()
+      {
+      }
   };
 
   typedef test_group<id_test> tf;

@@ -72,13 +72,27 @@ public:
     int warnings_count;
 
     console_reporter()
-        : os(std::cout)
+        : current_group(),
+          not_passed(),
+          os(std::cout),
+          ok_count(0),
+          exceptions_count(0),
+          failures_count(0),
+          terminations_count(0),
+          warnings_count(0)
     {
         init();
     }
 
     console_reporter(std::ostream& out)
-        : os(out)
+        : current_group(),
+          not_passed(),
+          os(out),
+          ok_count(0),
+          exceptions_count(0),
+          failures_count(0),
+          terminations_count(0),
+          warnings_count(0)
     {
         init();
     }

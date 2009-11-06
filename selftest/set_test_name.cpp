@@ -25,16 +25,24 @@ struct test_callback : public callback
     {
     }
 
+    test_callback()
+        : current_test_name()
+    {
+    }
+
     string current_test_name;
 };
 
 struct test_name_data
 {
-    test_runner runner;
+    test_runner tr;
     test_callback callback;
 
     struct dummy
     {
+        virtual ~dummy()
+        {
+        }
     };
 
     typedef test_group < dummy > tf;
@@ -42,11 +50,16 @@ struct test_name_data
     tf factory;
 
     test_name_data()
-        : factory("internal", runner)
+        : tr(),
+          callback(),
+          factory("internal", tr)
     {
     }
-}
-;
+
+    virtual ~test_name_data()
+    {
+    }
+};
 
 /**
  * Test functions under real test.
@@ -108,17 +121,17 @@ template < >
 template < >
 void set_test_name_tests::test < 1 > ()
 {
-    runner.set_callback(&callback);
+    tr.set_callback(&callback);
 
     test_result res;
 
-    ensure(runner.run_test("internal", 1, res));
+    ensure(tr.run_test("internal", 1, res));
     ensure_equals("test name", callback.current_test_name, "1");
 
-    ensure(runner.run_test("internal", 2, res));
+    ensure(tr.run_test("internal", 2, res));
     ensure_equals("test name", callback.current_test_name, "2");
 
-    ensure(runner.run_test("internal", 3, res));
+    ensure(tr.run_test("internal", 3, res));
 
     ensure_equals("test name", callback.current_test_name, "");
 }
@@ -130,10 +143,10 @@ template < >
 template < >
 void set_test_name_tests::test < 2 > ()
 {
-    runner.set_callback(&callback);
+    tr.set_callback(&callback);
 
     test_result res;
-    ensure(runner.run_test("internal", 4, res));
+    ensure(tr.run_test("internal", 4, res));
     ensure_equals("test name", callback.current_test_name, "failure");
 }
 
@@ -144,9 +157,9 @@ template < >
 template < >
 void set_test_name_tests::test < 3 > ()
 {
-    runner.set_callback(&callback);
+    tr.set_callback(&callback);
     test_result res;
-    ensure(runner.run_test("internal", 5, res));
+    ensure(tr.run_test("internal", 5, res));
     ensure_equals("test name", callback.current_test_name, "unexpected");
 }
 
@@ -158,9 +171,9 @@ template < >
 template < >
 void set_test_name_tests::test < 4 > ()
 {
-    runner.set_callback(&callback);
+    tr.set_callback(&callback);
     test_result res;
-    ensure(runner.run_test("internal", 6, res));
+    ensure(tr.run_test("internal", 6, res));
     ensure_equals("test name", callback.current_test_name, "seh");
 }
 #endif // TUT_USE_SEH

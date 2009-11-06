@@ -21,6 +21,10 @@ struct teardown_reaper
     tf factory;
 
     teardown_reaper();
+
+    virtual ~teardown_reaper()
+    {
+    }
 };
 
 std::set<pid_t> teardown_reaper::children;
@@ -85,7 +89,8 @@ void teardown_reaper::object::test<2>()
 
 
 teardown_reaper::teardown_reaper()
-    : factory("internal", tr)
+    : tr(),
+      factory("internal", tr)
 {
 }
 

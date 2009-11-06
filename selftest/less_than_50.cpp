@@ -16,12 +16,20 @@ struct less_than_50
     struct dummy
     {
         static bool called;
+
+        virtual ~dummy()
+        {
+        }
     };
     typedef test_group<dummy,2> tf;
     typedef tf::object object;
     tf factory;
 
     less_than_50();
+
+    virtual ~less_than_50()
+    {
+    }
 };
 
 bool less_than_50::dummy::called = false;
@@ -50,7 +58,8 @@ void less_than_50::object::test<3>()
  * Internal constructor
  */
 less_than_50::less_than_50()
-    : factory("internal", tr)
+    : tr(),
+      factory("internal", tr)
 {
 }
 

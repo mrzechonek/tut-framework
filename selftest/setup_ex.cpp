@@ -42,14 +42,23 @@ struct setup_ex
                 // at test 1
                 throw runtime_error("dummy");
             }
-        };
+        }
+
+        virtual ~dummy()
+        {
+        }
     };
     typedef test_group<dummy> tf;
     typedef tf::object object;
     tf factory;
 
     setup_ex()
-        : factory("internal", tr)
+        : tr(),
+          factory("internal", tr)
+    {
+    }
+
+    virtual ~setup_ex()
     {
     }
 };
