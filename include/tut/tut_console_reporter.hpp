@@ -42,7 +42,7 @@ std::ostream& operator<<(std::ostream& os, const tut::test_result& tr)
         os << '[' << tr.test << "=S]";
         break;
     case tut::test_result::dummy:
-        assert(!"Should never be called");
+        assert( (tr.result != tut::test_result::dummy) && "Should never be called");
     }
 
     return os;
@@ -133,7 +133,7 @@ public:
                 terminations_count++;
                 break;
             case tut::test_result::dummy:
-                assert(!"Should never be called");
+                assert( (tr.result != tut::test_result::dummy) && "Should never be called");
         } // switch
 
         if ( (tr.result != tut::test_result::ok) &&

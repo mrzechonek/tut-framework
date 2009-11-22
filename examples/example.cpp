@@ -1,4 +1,4 @@
-#include <tut.h>
+#include <tut/tut.hpp>
 #include <set>
 #include <memory>
 
@@ -18,7 +18,7 @@ namespace tut
    * of test result, so any cleanup work should be located in destructor.
    */
   struct auto_ptr_data
-  { 
+  {
     /**
      * Type used to check scope lifetime of auto_ptr object.
      * Sets extern boolean value into true at constructor, and

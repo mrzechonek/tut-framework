@@ -1,3 +1,0 @@
-TUT=../..
-include ../../Makefile.gcc-unix
-include Makefile.common

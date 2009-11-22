@@ -152,7 +152,7 @@ struct rethrown : public failure
     {
     }
 
-    test_result tr;
+    const test_result tr;
 };
 
 struct skipped : public tut_error

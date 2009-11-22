@@ -11,6 +11,7 @@
 #define TUT_XML_REPORTER
 
 #include <tut/tut.hpp>
+#include <cassert>
 #include <string>
 #include <fstream>
 #include <vector>

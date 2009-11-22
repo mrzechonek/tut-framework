@@ -25,7 +25,7 @@ public:
     {
     }
 
-    void test_completed(const tut::test_result& tr)
+    void test_completed(const tut::test_result&)
     {
         cnt++;
     }

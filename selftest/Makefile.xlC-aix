@@ -1,3 +1,0 @@
-TUT=..
-include ../Makefile.xlC-aix
-include Makefile.common

@@ -17,9 +17,9 @@ namespace tut
 class cppunit_reporter : public tut::callback
 {
     private:
-        std::vector<tut::test_result> failed_tests;
-        std::vector<tut::test_result> passed_tests;
-        std::string filename;
+        std::vector<tut::test_result> failed_tests_;
+        std::vector<tut::test_result> passed_tests_;
+        std::string filename_;
 
         std::string encode(const std::string & text)
         {
@@ -53,27 +53,17 @@ class cppunit_reporter : public tut::callback
 
 public:
 
-    cppunit_reporter(const std::string & _filename = "")
+    cppunit_reporter(const std::string & filename = "testResult.xml")
+        : failed_tests_(),
+          passed_tests_(),
+          filename_(filename)
     {
-        setFilename(_filename);
-    }
-
-    void setFilename(const std::string & _filename)
-    {
-        if (_filename == "")
-        {
-            filename = "testResult.xml";
-        }
-        else
-        {
-            filename = _filename;
-        }
     }
 
     void run_started()
     {
-        failed_tests.clear();
-        passed_tests.clear();
+        failed_tests_.clear();
+        passed_tests_.clear();
     }
 
     void test_completed(const tut::test_result& tr)
@@ -81,11 +71,11 @@ public:
         if ( (tr.result == test_result::ok) ||
              (tr.result == test_result::skipped) )
         {
-            passed_tests.push_back(tr);
+            passed_tests_.push_back(tr);
         }
         else
         {
-            failed_tests.push_back(tr);
+            failed_tests_.push_back(tr);
         }
     }
 
@@ -97,7 +87,7 @@ public:
         std::string failure_msg;
         std::ofstream xmlfile;
 
-        xmlfile.open(filename.c_str(), std::ios::in | std::ios::trunc);
+        xmlfile.open(filename_.c_str(), std::ios::in | std::ios::trunc);
         if (!xmlfile.is_open()) {
             throw (std::runtime_error("Cannot open file for output"));
         }
@@ -107,11 +97,11 @@ public:
                 << "<TestRun>" << std::endl;
 
         /* *********************** failed tests ***************************** */
-        if (failed_tests.size() > 0) {
+        if (failed_tests_.size() > 0) {
             xmlfile << "  <FailedTests>" << std::endl;
 
-            for (unsigned int i=0; i<failed_tests.size(); i++) {
-                switch (failed_tests[i].result) {
+            for (unsigned int i=0; i<failed_tests_.size(); i++) {
+                switch (failed_tests_[i].result) {
                     case test_result::fail:
                         failure_type = "Assertion";
                         failure_msg  = "";
@@ -119,7 +109,7 @@ public:
                         break;
                     case test_result::ex:
                         failure_type = "Assertion";
-                        failure_msg  = "Thrown exception: " + failed_tests[i].exception_typeid + '\n';
+                        failure_msg  = "Thrown exception: " + failed_tests_[i].exception_typeid + '\n';
                         failures++;
                         break;
                     case test_result::warn:
@@ -134,7 +124,7 @@ public:
                         break;
                     case test_result::ex_ctor:
                         failure_type = "Error";
-                        failure_msg  = "Constructor has thrown an exception: " + failed_tests[i].exception_typeid + '\n';
+                        failure_msg  = "Constructor has thrown an exception: " + failed_tests_[i].exception_typeid + '\n';
                         errors++;
                         break;
                     case test_result::rethrown:
@@ -150,14 +140,14 @@ public:
                         break;
                 }
 
-                xmlfile << "    <FailedTest id=\"" << failed_tests[i].test << "\">" << std::endl
-                        << "      <Name>" << encode(failed_tests[i].group) + "::" + encode(failed_tests[i].name) << "</Name>" << std::endl
+                xmlfile << "    <FailedTest id=\"" << failed_tests_[i].test << "\">" << std::endl
+                        << "      <Name>" << encode(failed_tests_[i].group) + "::" + encode(failed_tests_[i].name) << "</Name>" << std::endl
                         << "      <FailureType>" << failure_type << "</FailureType>" << std::endl
                         << "      <Location>" << std::endl
                         << "        <File>Unknown</File>" << std::endl
                         << "        <Line>Unknown</Line>" << std::endl
                         << "      </Location>" << std::endl
-                        << "      <Message>" << encode(failure_msg + failed_tests[i].message) << "</Message>" << std::endl
+                        << "      <Message>" << encode(failure_msg + failed_tests_[i].message) << "</Message>" << std::endl
                         << "    </FailedTest>" << std::endl;
             }
 
@@ -165,12 +155,12 @@ public:
         }
 
         /* *********************** passed tests ***************************** */
-        if (passed_tests.size() > 0) {
+        if (passed_tests_.size() > 0) {
             xmlfile << "  <SuccessfulTests>" << std::endl;
 
-            for (unsigned int i=0; i<passed_tests.size(); i++) {
-                xmlfile << "    <Test id=\"" << passed_tests[i].test << "\">" << std::endl
-                        << "      <Name>" << encode(passed_tests[i].group) + "::" + encode(passed_tests[i].name) << "</Name>" << std::endl
+            for (unsigned int i=0; i<passed_tests_.size(); i++) {
+                xmlfile << "    <Test id=\"" << passed_tests_[i].test << "\">" << std::endl
+                        << "      <Name>" << encode(passed_tests_[i].group) + "::" + encode(passed_tests_[i].name) << "</Name>" << std::endl
                         << "    </Test>" << std::endl;
             }
 
@@ -179,8 +169,8 @@ public:
 
         /* *********************** statistics ***************************** */
         xmlfile << "  <Statistics>" << std::endl
-                << "    <Tests>" << (failed_tests.size() + passed_tests.size()) << "</Tests>" << std::endl
-                << "    <FailuresTotal>" << failed_tests.size() << "</FailuresTotal>" << std::endl
+                << "    <Tests>" << (failed_tests_.size() + passed_tests_.size()) << "</Tests>" << std::endl
+                << "    <FailuresTotal>" << failed_tests_.size() << "</FailuresTotal>" << std::endl
                 << "    <Errors>" << errors << "</Errors>" << std::endl
                 << "    <Failures>" << failures << "</Failures>" << std::endl
                 << "  </Statistics>" << std::endl;
@@ -193,7 +183,7 @@ public:
 
     virtual bool all_ok() const
     {
-        return failed_tests.empty();
+        return failed_tests_.empty();
     };
 
 
