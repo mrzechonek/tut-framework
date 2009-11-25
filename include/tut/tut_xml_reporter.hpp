@@ -1,14 +1,6 @@
-/*
- * tut_xml_reporter.hpp
- *
- * ECOS Library. IPT CS R&D CET ECOS Copyright 2008 Nokia
- * Siemens Networks. All right
- *
- *
- */
-
 #ifndef TUT_XML_REPORTER
 #define TUT_XML_REPORTER
+#include <tut/tut_config.hpp>
 
 #include <tut/tut.hpp>
 #include <cassert>
@@ -127,6 +119,8 @@ protected:
             {
                 out << " child=\"" << pid << "\"";
             }
+#else
+            (void)pid;
 #endif
             out << ">" << err_msg << "</" << tag << ">" << endl;
             out << "  </testcase>";

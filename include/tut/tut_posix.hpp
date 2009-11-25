@@ -1,5 +1,6 @@
 #ifndef TUT_FORK_H_GUARD
 #define TUT_FORK_H_GUARD
+#include <tut/tut_config.hpp>
 
 #if defined(TUT_USE_POSIX)
 #include <errno.h>

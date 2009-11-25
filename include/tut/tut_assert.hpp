@@ -1,14 +1,18 @@
 #ifndef TUT_ASSERT_H_GUARD
 #define TUT_ASSERT_H_GUARD
+#include <tut/tut_config.hpp>
 
-#include "tut_exception.hpp"
 #include <limits>
 #include <iomanip>
+#include <iterator>
+#include <cassert>
 
 #if defined(TUT_USE_POSIX)
 #include <errno.h>
 #include <cstring>
 #endif
+
+#include "tut_exception.hpp"
 
 namespace tut
 {
@@ -127,6 +131,63 @@ void ensure_equals(const M& msg, const double& actual, const double& expected,
         throw failure(ss.str());
     }
 }
+
+template<typename LhsIterator, typename RhsIterator>
+void ensure_equals(const std::string &msg,
+                   const LhsIterator &lhs_begin, const LhsIterator &lhs_end,
+                   const RhsIterator &rhs_begin, const RhsIterator &rhs_end)
+{
+    typename std::iterator_traits<LhsIterator>::difference_type lhs_size = std::distance(lhs_begin, lhs_end);
+    typename std::iterator_traits<RhsIterator>::difference_type rhs_size = std::distance(rhs_begin, rhs_end);
+
+    if(lhs_size < rhs_size)
+    {
+        ensure_equals(msg + ": range is too short", lhs_size, rhs_size);
+    }
+
+    if(lhs_size > rhs_size)
+    {
+        ensure_equals(msg + ": range is too long", lhs_size, rhs_size);
+    }
+
+    assert(lhs_size == rhs_size);
+
+    LhsIterator lhs_i = lhs_begin;
+    RhsIterator rhs_i = rhs_begin;
+    while( (lhs_i != lhs_end) && (rhs_i != rhs_end) )
+    {
+        if(*lhs_i != *rhs_i)
+        {
+            std::stringstream ss;
+            detail::msg_prefix(ss,msg)
+                << "expected " << *rhs_i
+                << " actual " << *lhs_i
+                << " at offset " << std::distance(lhs_begin, lhs_i);
+            throw failure(ss.str());
+        }
+
+        lhs_i++;
+        rhs_i++;
+    }
+
+    assert(lhs_i == lhs_end);
+    assert(rhs_i == rhs_end);
+}
+
+template<typename LhsIterator, typename RhsIterator>
+void ensure_equals(const LhsIterator &lhs_begin, const LhsIterator &lhs_end,
+                   const RhsIterator &rhs_begin, const RhsIterator &rhs_end)
+{
+    ensure_equals("Ranges are not equal", lhs_begin, lhs_end, rhs_begin, rhs_end);
+}
+
+template<typename LhsType, typename RhsType>
+void ensure_equals(const LhsType *lhs_begin, const LhsType *lhs_end,
+                   const RhsType *rhs_begin, const RhsType *rhs_end)
+{
+    ensure_equals("Ranges are not equal", lhs_begin, lhs_end, rhs_begin, rhs_end);
+}
+
 /**
  * Tests two objects for being at most in given distance one from another.
  * Borders are excluded.

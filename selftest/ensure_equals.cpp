@@ -144,5 +144,144 @@ void object::test<13>()
     ensure_equals("double==double", lhs, rhs);
 }
 
+/**
+ * Checks positive ensure_equals with iterator range
+ */
+template<>
+template<>
+void object::test<14>()
+{
+    int lhs[] = { 4, 1, 2, 3 };
+    int rhs[] = { 4, 1, 2, 3 };
+
+    ensure_equals(lhs, lhs+4, rhs, rhs+4);
+}
+
+/**
+ * Checks nagative ensure_equals with iterator range
+ */
+template<>
+template<>
+void object::test<15>()
+{
+    int lhs[] = { 4, 1, 2, 6, 7, 5 };
+    int rhs[] = { 4, 1, 3, 6, 7, 3 };
+
+    try
+    {
+        ensure_equals(lhs, lhs+4, rhs, rhs+4);
+        throw runtime_error("ensure_equals failed");
+    }
+    catch (const failure& ex)
+    {
+        if (string(ex.what()).find("expected 3") == string::npos)
+        {
+            throw runtime_error("expected is wrong");
+        }
+
+        if (string(ex.what()).find("actual 2") == string::npos)
+        {
+            throw runtime_error("actual is wrong");
+        }
+
+        if (string(ex.what()).find("at offset 2") == string::npos)
+        {
+            throw runtime_error("offset is wrong");
+        }
+    }
+}
+
+namespace
+{
+
+struct Key
+{
+    Key(int k): k_(k) { }
+    operator int() const { return k_; }
+
+    int k_;
+};
+
+
+typedef std::string Value;
+
+}
+
+std::ostream &operator<<(std::ostream &ss, const std::pair<Key, Value> &pair)
+{
+    return ss << "(" << pair.first.k_ << "," << pair.second << ")";
+}
+
+/**
+ * Checks nagative ensure_equals with iterator range
+ */
+template<>
+template<>
+void object::test<16>()
+{
+    std::map<Key, Value> lhs;
+    lhs[1] = "one";
+    lhs[2] = "two";
+    lhs[3] = "three";
+    lhs[4] = "four";
+
+    std::map<Key, Value> rhs;
+
+    try
+    {
+        ensure_equals("size test", lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+        throw runtime_error("ensure_equals failed");
+    }
+    catch (const failure& ex)
+    {
+        if (string(ex.what()).find("size test: range is too long: expected '0' actual '4'") == string::npos)
+        {
+            throw runtime_error("expected is wrong");
+        }
+    }
+
+    rhs[1] = "one";
+    rhs[2] = "two";
+    rhs[3] = "three";
+    rhs[4] = "FOUR";
+
+    try
+    {
+        ensure_equals(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+        throw runtime_error("ensure_equals failed");
+    }
+    catch (const failure& ex)
+    {
+        if (string(ex.what()).find("expected (4,FOUR)") == string::npos)
+        {
+            throw runtime_error("expected is wrong");
+        }
+
+        if (string(ex.what()).find("actual (4,four)") == string::npos)
+        {
+            throw runtime_error("actual is wrong");
+        }
+
+        if (string(ex.what()).find("at offset") == string::npos)
+        {
+            throw runtime_error("offset is missing");
+        }
+    }
+
+    lhs.clear();
+    try
+    {
+        ensure_equals("size test", lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+        throw runtime_error("ensure_equals failed");
+    }
+    catch (const failure& ex)
+    {
+        if (string(ex.what()).find("size test: range is too short: expected '4' actual '0'") == string::npos)
+        {
+            throw runtime_error("expected is wrong");
+        }
+    }
+}
+
 }
 

@@ -22,7 +22,7 @@ def configure(conf):
         conf.env.CPPFLAGS += [ '-O0', '-g' ]
         conf.env.set_variant('debug')
 
-    conf.write_config_header('include/tut_config.h')
+    conf.write_config_header('include/tut/tut_config.hpp')
 
     print 'Configured for', conf.env.variant(), 'on', conf.env.PLATFORM
 

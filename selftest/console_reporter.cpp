@@ -59,6 +59,7 @@ void object::test<2>()
     ensure_equals("ex count", repo.exceptions_count, 0);
     ensure_equals("warn count", repo.warnings_count, 0);
     ensure_equals("term count", repo.terminations_count, 0);
+    ensure_equals("skip count", repo.skipped_count, 0);
 
     repo.run_started();
     repo.test_completed(tr1);
@@ -83,11 +84,12 @@ void object::test<2>()
     repo.test_completed(tr6);
     repo.test_completed(tr6);
 
-    ensure_equals("ok count", repo.ok_count, 1+6); // 'skipped' means 'ok'
+    ensure_equals("ok count", repo.ok_count, 1);
     ensure_equals("fail count", repo.failures_count, 2);
     ensure_equals("ex count", repo.exceptions_count, 3);
     ensure_equals("warn count", repo.warnings_count, 4);
     ensure_equals("term count", repo.terminations_count, 5);
+    ensure_equals("skip count", repo.skipped_count, 6);
     ensure(!repo.all_ok());
 }
 
@@ -143,6 +145,27 @@ void object::test<4>()
     repo.test_completed(tr1);
     repo.test_completed(tr6);
     ensure(repo.all_ok());
+}
+
+
+template<>
+template<>
+void object::test<5>()
+{
+    stringstream ss;
+    console_reporter repo(ss);
+
+    repo.run_started();
+    repo.test_completed(tr1);
+    repo.test_completed(tr3);
+    repo.test_completed(tr6);
+    repo.run_completed();
+
+    std::string output = ss.str();
+    std::string format = "\nfoo: .[3=X][6=S]\n\n---> group: foo, test: test<3>\n     problem: unexpected exception\n\n"
+                         "tests summary: exceptions:1 ok:1 skipped:1\n";
+
+    ensure_equals("output formatting mismatch", output.begin(), output.end(), format.begin(), format.end());
 }
 
 }

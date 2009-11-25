@@ -1,5 +1,6 @@
 #ifndef TUT_CONSOLE_REPORTER
 #define TUT_CONSOLE_REPORTER
+#include <tut/tut_config.hpp>
 
 #include <tut/tut.hpp>
 #include <cassert>
@@ -70,6 +71,7 @@ public:
     int failures_count;
     int terminations_count;
     int warnings_count;
+    int skipped_count;
 
     console_reporter()
         : current_group(),
@@ -79,7 +81,8 @@ public:
           exceptions_count(0),
           failures_count(0),
           terminations_count(0),
-          warnings_count(0)
+          warnings_count(0),
+          skipped_count(0)
     {
         init();
     }
@@ -92,7 +95,9 @@ public:
           exceptions_count(0),
           failures_count(0),
           terminations_count(0),
-          warnings_count(0)
+          warnings_count(0),
+          skipped_count(0)
+
     {
         init();
     }
@@ -115,7 +120,6 @@ public:
         // update global statistics
         switch (tr.result) {
             case test_result::ok:
-            case test_result::skipped:
                 ok_count++;
                 break;
             case test_result::fail:
@@ -131,6 +135,9 @@ public:
                 break;
             case test_result::term:
                 terminations_count++;
+                break;
+            case test_result::skipped:
+                skipped_count++;
                 break;
             case tut::test_result::dummy:
                 assert( (tr.result != tut::test_result::dummy) && "Should never be called");
@@ -233,7 +240,13 @@ public:
         {
             os << " warnings:" << warnings_count;
         }
+        
         os << " ok:" << ok_count;
+
+        if(skipped_count > 0)
+        {
+            os << " skipped:" << skipped_count;
+        }
         os << std::endl;
     }
 
@@ -251,6 +264,7 @@ private:
         failures_count = 0;
         terminations_count = 0;
         warnings_count = 0;
+        skipped_count = 0;
         not_passed.clear();
     }
 };

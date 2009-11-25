@@ -1,5 +1,6 @@
 #ifndef TUT_RESULT_H_GUARD
 #define TUT_RESULT_H_GUARD
+#include <tut/tut_config.hpp>
 
 #include <string>
 

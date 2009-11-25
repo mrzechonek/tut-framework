@@ -1,5 +1,6 @@
 #ifndef TUT_H_GUARD
 #define TUT_H_GUARD
+#include <tut/tut_config.hpp>
 
 #include <iostream>
 #include <map>
@@ -10,10 +11,6 @@
 #include <iterator>
 #include <algorithm>
 #include <typeinfo>
-
-#if defined(linux)
-#define TUT_USE_POSIX
-#endif
 
 #include "tut_exception.hpp"
 #include "tut_result.hpp"
