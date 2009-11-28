@@ -42,12 +42,14 @@ template<>
 template<>
 void object::test<1>()
 {
+    skip();
 }
 
 template<>
 template<>
 void object::test<2>()
 {
+    skip();
 #if 0
     std::stringstream ss;
     cppunit_reporter repo(ss);
@@ -94,6 +96,7 @@ template<>
 template<>
 void object::test<3>()
 {
+    skip();
 #if 0
     std::stringstream ss;
     cppunit_reporter repo(ss);
@@ -113,6 +116,7 @@ template<>
 template<>
 void object::test<4>()
 {
+    skip();
 #if 0
     std::stringstream ss;
     cppunit_reporter repo(ss);

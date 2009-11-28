@@ -14,7 +14,7 @@ namespace tut
 
   typedef test_group<id_test> tf;
   typedef tf::object object;
-  tf id_test("get_test_id()");
+  tf id_test("test_id");
 
   /**
    * Checks positive ensure

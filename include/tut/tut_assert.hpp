@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <iterator>
 #include <cassert>
+#include <cmath>
 
 #if defined(TUT_USE_POSIX)
 #include <errno.h>
@@ -97,11 +98,11 @@ void ensure_equals(const M& msg, const LHS& actual, const RHS& expected)
     {
         std::stringstream ss;
         detail::msg_prefix(ss,msg)
-           << "expected '"
+           << "expected `"
            << expected
-           << "' actual '"
+           << "` actual `"
            << actual
-           << '\'';
+           << "`";
         throw failure(ss.str());
     }
 }
@@ -125,9 +126,9 @@ void ensure_equals(const M& msg, const double& actual, const double& expected,
            << std::scientific
            << std::showpoint
            << std::setprecision(16)
-           << "expected " << expected
-           << " actual " << actual
-           << " with precision " << epsilon;
+           << "expected `" << expected
+           << "` actual `" << actual
+           << "` with precision `" << epsilon << "`";
         throw failure(ss.str());
     }
 }
@@ -160,9 +161,9 @@ void ensure_equals(const std::string &msg,
         {
             std::stringstream ss;
             detail::msg_prefix(ss,msg)
-                << "expected " << *rhs_i
-                << " actual " << *lhs_i
-                << " at offset " << std::distance(lhs_begin, lhs_i);
+                << "expected `" << *rhs_i
+                << "` actual `" << *lhs_i
+                << "` at offset " << std::distance(lhs_begin, lhs_i);
             throw failure(ss.str());
         }
 
@@ -206,13 +207,13 @@ void ensure_distance(const M& msg, const T& actual, const T& expected, const T& 
     {
         std::stringstream ss;
         detail::msg_prefix(ss,msg)
-            << " expected ("
+            << " expected `"
             << expected-distance
-            << " - "
+            << "` - `"
             << expected+distance
-            << ") actual '"
+            << "` actual `"
             << actual
-            << '\'';
+            << "`";
         throw failure(ss.str());
     }
 }

@@ -1,4 +1,5 @@
 #include <tut/tut.hpp>
+#include <tut/tut_macros.hpp>
 #include <string>
 #include <stdexcept>
 
@@ -17,7 +18,7 @@ struct skip_test
 
 typedef test_group<skip_test> tf;
 typedef tf::object object;
-tf skip_test("skip()");
+tf skip_test("skip");
 
 template<>
 template<>
@@ -45,14 +46,7 @@ void object::test<2>()
 {
     set_test_name("checks skip without message");
 
-    try
-    {
-        skip();
-        throw std::runtime_error("skip doesn't work");
-    }
-    catch (const skipped&)
-    {
-    }
+    ensure_THROW( skip(), skipped );
 }
 
 }

@@ -22,7 +22,7 @@ namespace tut
 
   typedef test_group<ensure_test> tf;
   typedef tf::object object;
-  tf ensure_test("ensure()");
+  tf ensure_test("ensure");
 
   /**
    * Checks positive ensure

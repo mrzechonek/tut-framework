@@ -14,7 +14,7 @@ namespace tut
 
   typedef test_group<ensure_not_test> tf;
   typedef tf::object object;
-  tf ensure_not_test("ensure_not()");
+  tf ensure_not_test("ensure_not");
 
   /**
    * Checks ensure_not

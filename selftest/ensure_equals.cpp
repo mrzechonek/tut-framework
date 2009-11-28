@@ -20,7 +20,7 @@ struct ensure_eq_test
 
 typedef test_group<ensure_eq_test> tf;
 typedef tf::object object;
-tf ensure_eq_test("ensure_equals()");
+tf ensure_eq_test("ensure_equals");
 
 /**
  * Checks positive ensure_equals with simple types
@@ -127,6 +127,16 @@ void object::test<12>()
         {
             throw runtime_error("contains wrong message");
         }
+
+        if (string(ex.what()).find("expected `boo`") == string::npos)
+        {
+            throw runtime_error("expected is wrong");
+        }
+
+        if (string(ex.what()).find("actual `foo`") == string::npos)
+        {
+            throw runtime_error("actual is wrong");
+        }
     }
 }
 
@@ -174,12 +184,12 @@ void object::test<15>()
     }
     catch (const failure& ex)
     {
-        if (string(ex.what()).find("expected 3") == string::npos)
+        if (string(ex.what()).find("expected `3`") == string::npos)
         {
             throw runtime_error("expected is wrong");
         }
 
-        if (string(ex.what()).find("actual 2") == string::npos)
+        if (string(ex.what()).find("actual `2`") == string::npos)
         {
             throw runtime_error("actual is wrong");
         }
@@ -230,13 +240,13 @@ void object::test<16>()
     try
     {
         ensure_equals("size test", lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-        throw runtime_error("ensure_equals failed");
+        throw runtime_error("1. ensure_equals failed");
     }
     catch (const failure& ex)
     {
-        if (string(ex.what()).find("size test: range is too long: expected '0' actual '4'") == string::npos)
+        if (string(ex.what()).find("size test: range is too long: expected `0` actual `4`") == string::npos)
         {
-            throw runtime_error("expected is wrong");
+            throw runtime_error("range too long: wrong message");
         }
     }
 
@@ -252,12 +262,12 @@ void object::test<16>()
     }
     catch (const failure& ex)
     {
-        if (string(ex.what()).find("expected (4,FOUR)") == string::npos)
+        if (string(ex.what()).find("expected `(4,FOUR)`") == string::npos)
         {
             throw runtime_error("expected is wrong");
         }
 
-        if (string(ex.what()).find("actual (4,four)") == string::npos)
+        if (string(ex.what()).find("actual `(4,four)`") == string::npos)
         {
             throw runtime_error("actual is wrong");
         }
@@ -272,13 +282,13 @@ void object::test<16>()
     try
     {
         ensure_equals("size test", lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-        throw runtime_error("ensure_equals failed");
+        throw runtime_error("2. ensure_equals failed");
     }
     catch (const failure& ex)
     {
-        if (string(ex.what()).find("size test: range is too short: expected '4' actual '0'") == string::npos)
+        if (string(ex.what()).find("size test: range is too short: expected `4` actual `0`") == string::npos)
         {
-            throw runtime_error("expected is wrong");
+            throw runtime_error("range too short: wrong message");
         }
     }
 }

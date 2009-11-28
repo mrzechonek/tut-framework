@@ -1,58 +1,48 @@
 #include <tut/tut.hpp>
 #include <tut/tut_console_reporter.hpp>
+#include <tut/tut_main.hpp>
 
-#include <exception>
 #include <iostream>
-
-using tut::runner;
-
-using std::exception;
-using std::cout;
-using std::cerr;
-using std::endl;
 
 namespace tut
 {
-
-test_runner_singleton runner;
-
+    test_runner_singleton runner;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     tut::console_reporter reporter;
+    tut::runner.get().set_callback(&reporter);
 
     try
     {
-        tut::runner.get().set_callback(&reporter);
-        tut::runner.get().run_tests();
-
-        if (!reporter.all_ok())
+        if(tut::tut_main(argc, argv))
         {
-            cout << endl;
-            cout << "*********************************************************"
-                << endl;
-            cout << "WARNING: THIS VERSION OF TUT IS UNUSABLE DUE TO ERRORS!!!"
-                << endl;
-            cout << "*********************************************************"
-                << endl;
-        }
-        else
-        {
-            cout << endl;
-            cout << "THIS VERSION OF TUT IS CORRECT" << endl;
+            if(reporter.all_ok())
+            {
+                return 0;
+            }
+            else
+            {
+                std::cerr << std::endl;
+                std::cerr << "*********************************************************" << std::endl;
+                std::cerr << "WARNING: THIS VERSION OF TUT IS UNUSABLE DUE TO ERRORS!!!" << std::endl;
+                std::cerr << "*********************************************************" << std::endl;
+            }
         }
     }
-    catch (const std::exception& ex)
+    catch(const tut::no_such_group &ex)
     {
-        cerr << "tut raised ex: " << ex.what() << endl;
-        return 1;
+        std::cerr << "No such group: " << ex.what() << std::endl;
     }
-    catch( ... )
+    catch(const tut::no_such_test &ex)
     {
-        cerr << "tut raised unknown exception" << endl;
-        return 1;
+        std::cerr << "No such test: " << ex.what() << std::endl;
+    }
+    catch(const tut::tut_error &ex)
+    {
+        std::cout << "General error: " << ex.what() << std::endl;
     }
 
-    return !reporter.all_ok();
+    return -1;
 }

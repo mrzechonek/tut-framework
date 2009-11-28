@@ -53,6 +53,21 @@ struct no_such_group : public tut_error
 };
 
 /**
+ * Test not found exception.
+ */
+struct no_such_test : public tut_error
+{
+    explicit no_such_test(const std::string& grp)
+        : tut_error(grp)
+    {
+    }
+
+    ~no_such_test() throw()
+    {
+    }
+};
+
+/**
  * Internal exception to be throwed when
  * test constructor has failed.
  */

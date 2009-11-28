@@ -1,4 +1,5 @@
 #include <tut/tut.hpp>
+#include <tut/tut_macros.hpp>
 #include <string>
 #include <stdexcept>
 
@@ -20,7 +21,7 @@ struct fail_test
 
 typedef test_group<fail_test> tf;
 typedef tf::object object;
-tf fail_test("fail()");
+tf fail_test("fail");
 
 template<>
 template<>
@@ -48,14 +49,7 @@ void object::test<2>()
 {
     set_test_name("checks fail without message");
 
-    try
-    {
-        fail();
-        throw runtime_error("fail doesn't work");
-    }
-    catch (const failure&)
-    {
-    }
+    ensure_THROW( fail(), failure );
 }
 
 }

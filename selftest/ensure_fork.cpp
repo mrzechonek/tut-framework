@@ -32,7 +32,7 @@ namespace tut
 
     typedef test_group<ensure_fork_test> tf;
     typedef tf::object object;
-    tf ensure_fork_test("ensure_fork()");
+    tf ensure_fork_test("ensure_fork");
 
     template<>
     template<>

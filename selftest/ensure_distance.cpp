@@ -1,8 +1,5 @@
 #include <tut/tut.hpp>
-
-#include <stdexcept>
-
-using std::runtime_error;
+#include <tut/tut_macros.hpp>
 
 namespace tut
 {
@@ -19,7 +16,7 @@ struct ensure_distance_test
 
 typedef test_group<ensure_distance_test> tf;
 typedef tf::object object;
-tf ensure_distance_test("ensure_distance()");
+tf ensure_distance_test("ensure_distance");
 
 /**
  * Checks positive ensure_distance with simple types
@@ -60,23 +57,8 @@ void object::test<10>()
 {
     set_test_name("checks negative ensure_distance with simple types");
 
-    try
-    {
-        ensure_distance("2!~1", 2, 1, 1);
-        throw runtime_error("ensure_distance failed");
-    }
-    catch (const failure&)
-    {
-    }
-
-    try
-    {
-        ensure_distance("0!~1", 0, 1, 1);
-        throw runtime_error("ensure_distance failed");
-    }
-    catch (const failure&)
-    {
-    }
+    ensure_THROW( ensure_distance("2!~1", 2, 1, 1), failure );
+    ensure_THROW( ensure_distance("0!~1", 0, 1, 1), failure );
 }
 
 /**
@@ -88,23 +70,8 @@ void object::test<11>()
 {
     set_test_name("checks negative ensure_distance with simple types");
 
-    try
-    {
-        ensure_distance(2, 1, 1);
-        throw runtime_error("ensure_distance failed");
-    }
-    catch (const failure&)
-    {
-    }
-
-    try
-    {
-        ensure_distance(0, 1, 1);
-        throw runtime_error("ensure_distance failed");
-    }
-    catch (const failure&)
-    {
-    }
+    ensure_THROW( ensure_distance(2, 1, 1), failure );
+    ensure_THROW( ensure_distance(0, 1, 1), failure );
 }
 
 /**
@@ -116,23 +83,8 @@ void object::test<12>()
 {
     set_test_name("checks negative ensure_distance with doubles");
 
-    try
-    {
-        ensure_distance("1.0!=1.02", 1.02, 1.0, 0.01);
-        throw runtime_error("ensure_distance failed");
-    }
-    catch (const failure&)
-    {
-    }
-
-    try
-    {
-        ensure_distance("1.0!=0.98", 0.98, 1.0, 0.01);
-        throw runtime_error("ensure_distance failed");
-    }
-    catch (const failure&)
-    {
-    }
+    ensure_THROW( ensure_distance("1.0!=1.02", 1.02, 1.0, 0.01), failure );
+    ensure_THROW( ensure_distance("1.0!=0.98", 0.98, 1.0, 0.01), failure );
 }
 
 }
