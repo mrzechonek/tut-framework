@@ -15,6 +15,7 @@ namespace tut
 struct shared_ptr_data
 {
     bool keepee_exists;
+
     struct keepee
     {
         bool& s_;
@@ -22,7 +23,7 @@ struct shared_ptr_data
         {
             s_ = true;
         }
-        
+
         ~keepee()
         {
             s_ = false;
@@ -30,11 +31,12 @@ struct shared_ptr_data
     };
 
     shared_ptr_data()
-    { 
+        : keepee_exists(false)
+    {
     }
-    
-    ~shared_ptr_data()
-    { 
+
+    virtual ~shared_ptr_data()
+    {
     }
 };
 

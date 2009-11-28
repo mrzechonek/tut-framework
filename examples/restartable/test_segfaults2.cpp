@@ -6,9 +6,10 @@
  */
 namespace tut
 {
-    
+
 struct segfault_data_2
 {
+    virtual ~segfault_data_2() { }
 };
 
 typedef test_group<segfault_data_2> tg;

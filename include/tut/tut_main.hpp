@@ -15,7 +15,7 @@ namespace tut
  *
  * @code
  *  namespace tut { test_runner_singleton runner; }
- *  
+ *
  *  int main(int argc, char **argv)
  *  {
  *      if( tut_main(argc, argv) )
@@ -31,7 +31,7 @@ namespace tut
  *
  * @code
  *  namespace tut { test_runner_singleton runner; }
- *  
+ *
  *  int main(int argc, char **argv)
  *  {
  *      tut::xml_reporter reporter;
@@ -50,7 +50,7 @@ namespace tut
  *  }
  * @endcode
  */
-inline bool tut_main(int argc, char **argv)
+inline bool tut_main(int argc, const char **argv)
 {
     std::stringstream usage;
     usage << "Usage: " << argv[0] << " [group] [testcase]" << std::endl;

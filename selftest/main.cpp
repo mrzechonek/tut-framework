@@ -9,7 +9,7 @@ namespace tut
     test_runner_singleton runner;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
     tut::console_reporter reporter;
     tut::runner.get().set_callback(&reporter);

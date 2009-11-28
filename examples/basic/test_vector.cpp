@@ -12,6 +12,9 @@ namespace tut
 struct vector_basic
 {
     vector<int> v;
+
+    vector_basic(): v() { }
+    virtual ~vector_basic() { }
 };
 
 // Test group registration

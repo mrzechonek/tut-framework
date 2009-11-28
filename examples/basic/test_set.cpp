@@ -10,6 +10,9 @@ namespace tut
 struct set_basic
 {
     set<int> s;
+
+    set_basic(): s() { }
+    virtual ~set_basic() { }
 };
 
 typedef test_group<set_basic> factory;
@@ -18,7 +21,7 @@ typedef factory::object object;
 
 namespace
 {
-    
+
 tut::factory tf("std::set basic operations");
 
 }

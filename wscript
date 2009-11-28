@@ -86,9 +86,28 @@ def build(bld):
                        os.path.join(bld.bdir, bld.env.variant(), 'lib', 'pkgconfig', 'tut.pc'))
 
 
-    selftest = bld.new_task_gen(features='cxx cprogram', target='self_test', includes='.',
+    selftest = bld.new_task_gen(features='cxx cprogram', target='self_test',
                                 uselib_local = 'tut',
                                 install_path = None,
                                 source = glob.glob('selftest/*.cpp'))
 
+    ex_simple = bld.new_task_gen(features='cxx cprogram', target='example_simple',
+                                 uselib_local = 'tut',
+                                 install_path = None,
+                                 source = 'examples/simple.cpp')
+
+    ex_basic = bld.new_task_gen(features='cxx cprogram', target='example_basic',
+                                uselib_local = 'tut',
+                                install_path = None,
+                                source = glob.glob('examples/basic/*.cpp'))
+
+    ex_sharedptr = bld.new_task_gen(features='cxx cprogram', target='example_sharedptr', includes='.',
+                                    uselib_local = 'tut',
+                                    install_path = None,
+                                    source = glob.glob('examples/shared_ptr/*.cpp'))
+
+    ex_restartable = bld.new_task_gen(features='cxx cprogram', target='example_restartable',
+                                      uselib_local = 'tut',
+                                      install_path = None,
+                                      source = glob.glob('examples/restartable/*.cpp'))
 

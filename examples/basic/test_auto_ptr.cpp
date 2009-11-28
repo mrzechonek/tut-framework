@@ -30,6 +30,7 @@ struct auto_ptr_data
      * to false at destructor.
      */
     bool exists;
+
     struct existing
     {
         bool& s_;
@@ -37,11 +38,16 @@ struct auto_ptr_data
         {
             s_ = true;
         }
+
         ~existing()
         {
             s_ = false;
         }
     };
+
+    auto_ptr_data(): exists(false) { }
+
+    virtual ~auto_ptr_data() { }
 };
 
 /**
