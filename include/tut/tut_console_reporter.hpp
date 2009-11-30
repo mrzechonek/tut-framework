@@ -64,6 +64,8 @@ class console_reporter : public tut::callback
     not_passed_list not_passed;
     std::ostream& os;
 
+    console_reporter(const console_reporter &);
+    console_reporter &operator=(const console_reporter &);
 public:
 
     int ok_count;
@@ -240,7 +242,7 @@ public:
         {
             os << " warnings:" << warnings_count;
         }
-        
+
         os << " ok:" << ok_count;
 
         if(skipped_count > 0)

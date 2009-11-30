@@ -5,7 +5,7 @@
 #include <tut/tut_console_reporter.hpp>
 #include <tut/tut_cppunit_reporter.hpp>
 #include <iostream>
-#include <string.h>
+#include <cstring>
 
 namespace tut
 {
