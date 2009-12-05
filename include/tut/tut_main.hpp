@@ -51,7 +51,7 @@ namespace tut
  *  }
  * @endcode
  */
-inline bool tut_main(int argc, const char **argv)
+inline bool tut_main(int argc, const char **argv, std::ostream &os = std::cerr)
 {
     std::stringstream usage;
     usage << "Usage: " << argv[0] << " [group] [testcase]" << std::endl;
@@ -66,9 +66,10 @@ inline bool tut_main(int argc, const char **argv)
     {
         if(std::string(argv[1]) == "-h" ||
            std::string(argv[1]) == "--help" ||
-           std::string(argv[1]) == "/?")
+           std::string(argv[1]) == "/?" ||
+           argc > 3)
         {
-            std::cerr << usage.rdbuf();
+            os << usage.rdbuf();
             return false;
         }
     }
@@ -99,11 +100,6 @@ inline bool tut_main(int argc, const char **argv)
                 throw no_such_test("No testcase `" + std::string(argv[2]) + "` in group `" + argv[1] + "`");
             }
         }
-        break;
-
-        default:
-            std::cerr << usage.rdbuf();
-            return false;
         break;
     }
 

@@ -61,6 +61,7 @@ void object::test<2>()
     ensure_equals(Traits::zero, 0.0);
     ensure_equals(Traits::div(0.0, max), 0.0);
     ensure_equals(Traits::div(0.0, -max), -0.0);
+    ensure("0/0 is not a number", Traits::div(0.0, 0.0) != 0.0);
 
     ensure_equals(Traits::div(1.0,0), INFINITY);
     ensure_equals(Traits::div(-1.0,0), -INFINITY);
@@ -130,6 +131,8 @@ void object::test<5>()
 
     ensure_THROW( ensure_close("2!~1", 2, 1, 1), failure );
     ensure_THROW( ensure_close("0!~1", 0, 1, 1), failure );
+    ensure_THROW( ensure_close_fraction("2!~1", 2, 1, 0.01), failure );
+    ensure_THROW( ensure_close_fraction("2!~1", 2, 1, 0.01), failure );
 }
 
 /**

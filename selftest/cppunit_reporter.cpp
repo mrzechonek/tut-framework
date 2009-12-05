@@ -1,4 +1,5 @@
 #include <tut/tut.hpp>
+#include <tut/tut_macros.hpp>
 #include <tut/tut_cppunit_reporter.hpp>
 #include <sstream>
 #include <iterator>
@@ -132,7 +133,7 @@ void object::test<3>()
         "<TestRun>\n"
         "  <FailedTests>\n";
 
-    expected += 
+    expected +=
         "    <FailedTest id=\"2\">\n"
         "      <Name>fail::tr2</Name>\n"
         "      <FailureType>Assertion</FailureType>\n"
@@ -143,7 +144,7 @@ void object::test<3>()
         "      <Message>fail message</Message>\n"
         "    </FailedTest>\n";
 
-    expected += 
+    expected +=
         "    <FailedTest id=\"3\">\n"
         "      <Name>ex::tr3</Name>\n"
         "      <FailureType>Assertion</FailureType>\n"
@@ -154,7 +155,7 @@ void object::test<3>()
         "      <Message>Thrown exception: exception\nex message</Message>\n"
         "    </FailedTest>\n";
 
-    expected += 
+    expected +=
         "    <FailedTest id=\"4\">\n"
         "      <Name>warn::tr4</Name>\n"
         "      <FailureType>Assertion</FailureType>\n"
@@ -165,7 +166,7 @@ void object::test<3>()
         "      <Message>Destructor failed\nwarn message</Message>\n"
         "    </FailedTest>\n";
 
-    expected += 
+    expected +=
         "    <FailedTest id=\"5\">\n"
         "      <Name>term::tr5</Name>\n"
         "      <FailureType>Error</FailureType>\n"
@@ -176,7 +177,7 @@ void object::test<3>()
         "      <Message>Test application terminated abnormally\nterm message</Message>\n"
         "    </FailedTest>\n";
 
-    expected += 
+    expected +=
         "    <FailedTest id=\"7\">\n"
         "      <Name>ctor::tr7</Name>\n"
         "      <FailureType>Error</FailureType>\n"
@@ -187,7 +188,7 @@ void object::test<3>()
         "      <Message>Constructor has thrown an exception: exception\nex_ctor message</Message>\n"
         "    </FailedTest>\n";
 
-    expected += 
+    expected +=
         "    <FailedTest id=\"8\">\n"
         "      <Name>rethrown::tr8</Name>\n"
         "      <FailureType>Assertion</FailureType>\n"
@@ -202,12 +203,12 @@ void object::test<3>()
         "  </FailedTests>\n"
         "  <SuccessfulTests>\n";
 
-    expected += 
+    expected +=
         "    <Test id=\"1\">\n"
         "      <Name>ok::tr1</Name>\n"
         "    </Test>\n";
-    
-    expected += 
+
+    expected +=
         "    <Test id=\"6\">\n"
         "      <Name>skipped::tr6</Name>\n"
         "    </Test>\n";
@@ -226,6 +227,29 @@ void object::test<3>()
 
     ensure(!repo.all_ok());
     ensure_equals( actual.begin(), actual.end(), expected.begin(), expected.end() );
+}
+
+template<>
+template<>
+void object::test<4>()
+{
+    ensure_equals( cppunit_reporter::encode("<"),  "&lt;" );
+    ensure_equals( cppunit_reporter::encode(">"),  "&gt;" );
+    ensure_equals( cppunit_reporter::encode("&"),  "&amp;" );
+    ensure_equals( cppunit_reporter::encode("\""), "&quot;" );
+    ensure_equals( cppunit_reporter::encode("\'"), "&apos;" );
+
+    ensure_equals( cppunit_reporter::encode("<\'\">\"a&"), "&lt;&apos;&quot;&gt;&quot;a&amp;" );
+
+}
+
+template<>
+template<>
+void object::test<5>()
+{
+    set_test_name("tests handling errors when opening file");
+
+    ensure_THROW( cppunit_reporter repo(".."), tut_error );
 }
 
 }

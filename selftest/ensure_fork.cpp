@@ -285,3 +285,32 @@ namespace tut
 }
 
 #endif
+
+namespace tut
+{
+    struct ensure_fork_test2
+    {
+        virtual ~ensure_fork_test2()
+        {
+        }
+    };
+
+    typedef test_group<ensure_fork_test2> tf2;
+    typedef tf2::object object2;
+    tf2 ensure_fork_test2("ensure_fork2");
+
+    template<>
+    template<>
+    void object2::test<1>()
+    {
+        try
+        {
+            throw rethrown( test_result("group", 1, "test", test_result::ex_ctor) );
+        }
+        catch(const failure &ex)
+        {
+            ensure_equals(ex.result(), test_result::rethrown);
+            ensure_equals(ex.tr.result, test_result::ex_ctor);
+        }
+    }
+}

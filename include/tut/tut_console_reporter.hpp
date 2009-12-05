@@ -1,7 +1,6 @@
 #ifndef TUT_CONSOLE_REPORTER
 #define TUT_CONSOLE_REPORTER
 #include <tut/tut_config.hpp>
-
 #include <tut/tut.hpp>
 #include <cassert>
 
@@ -18,32 +17,32 @@ std::ostream& operator<<(std::ostream& os, const tut::test_result& tr)
 {
     switch(tr.result)
     {
-    case tut::test_result::ok:
-        os << '.';
-        break;
-    case tut::test_result::fail:
-        os << '[' << tr.test << "=F]";
-        break;
-    case tut::test_result::ex_ctor:
-        os << '[' << tr.test << "=C]";
-        break;
-    case tut::test_result::ex:
-        os << '[' << tr.test << "=X]";
-        break;
-    case tut::test_result::warn:
-        os << '[' << tr.test << "=W]";
-        break;
-    case tut::test_result::term:
-        os << '[' << tr.test << "=T]";
-        break;
-    case tut::test_result::rethrown:
-        os << '[' << tr.test << "=P]";
-        break;
-    case tut::test_result::skipped:
-        os << '[' << tr.test << "=S]";
-        break;
-    case tut::test_result::dummy:
-        assert( (tr.result != tut::test_result::dummy) && "Should never be called");
+        case tut::test_result::ok:
+            os << '.';
+            break;
+        case tut::test_result::fail:
+            os << '[' << tr.test << "=F]";
+            break;
+        case tut::test_result::ex_ctor:
+            os << '[' << tr.test << "=C]";
+            break;
+        case tut::test_result::ex:
+            os << '[' << tr.test << "=X]";
+            break;
+        case tut::test_result::warn:
+            os << '[' << tr.test << "=W]";
+            break;
+        case tut::test_result::term:
+            os << '[' << tr.test << "=T]";
+            break;
+        case tut::test_result::rethrown:
+            os << '[' << tr.test << "=P]";
+            break;
+        case tut::test_result::skipped:
+            os << '[' << tr.test << "=S]";
+            break;
+        case tut::test_result::dummy:
+            throw tut::tut_error("console reporter called for dummy test result");
     }
 
     return os;

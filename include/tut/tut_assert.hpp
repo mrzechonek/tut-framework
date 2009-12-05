@@ -107,15 +107,8 @@ void ensure_equals(const M& msg, const LHS& actual, const RHS& expected)
     }
 }
 
-template <typename LHS, typename RHS>
-void ensure_equals(const LHS& actual, const RHS& expected)
-{
-    ensure_equals("Values are not equal", actual, expected);
-}
-
 template<typename M>
-void ensure_equals(const M& msg, const double& actual, const double& expected,
-                   const double& epsilon = std::numeric_limits<double>::epsilon())
+void ensure_equals(const M& msg, const double& actual, const double& expected, const double& epsilon)
 {
     const double diff = actual - expected;
 
@@ -132,6 +125,19 @@ void ensure_equals(const M& msg, const double& actual, const double& expected,
         throw failure(ss.str());
     }
 }
+
+template<typename M>
+void ensure_equals(const M& msg, const double& actual, const double& expected)
+{
+    ensure_equals(msg, actual, expected, std::numeric_limits<double>::epsilon());
+}
+
+template <typename LHS, typename RHS>
+void ensure_equals(const LHS& actual, const RHS& expected)
+{
+    ensure_equals("Values are not equal", actual, expected);
+}
+
 
 template<typename LhsIterator, typename RhsIterator>
 void ensure_equals(const std::string &msg,

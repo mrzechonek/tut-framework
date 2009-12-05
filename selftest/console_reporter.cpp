@@ -1,4 +1,5 @@
 #include <tut/tut.hpp>
+#include <tut/tut_macros.hpp>
 #include <tut/tut_console_reporter.hpp>
 #include <sstream>
 
@@ -18,6 +19,8 @@ struct reporter_test
     test_result tr4;
     test_result tr5;
     test_result tr6;
+    test_result tr7;
+    test_result tr8;
 
     reporter_test()
         : tr1("foo", 1, "", test_result::ok),
@@ -25,7 +28,9 @@ struct reporter_test
           tr3("foo", 3, "", test_result::ex),
           tr4("foo", 4, "", test_result::warn),
           tr5("foo", 5, "", test_result::term),
-          tr6("foo", 6, "", test_result::skipped)
+          tr6("foo", 6, "", test_result::skipped),
+          tr7("foo", 7, "", test_result::ex_ctor),
+          tr8("foo", 8, "", test_result::rethrown)
     {
     }
 
@@ -43,8 +48,10 @@ template<>
 void object::test<1>()
 {
     stringstream ss;
-    ss << tr1 << tr2 << tr3 << tr4 << tr5 << tr6;
-    ensure_equals("operator << formatter", ss.str(), ".[2=F][3=X][4=W][5=T][6=S]");
+    ss << tr1 << tr2 << tr3 << tr4 << tr5 << tr6 << tr7 << tr8;
+    ensure_equals("operator << formatter", ss.str(), ".[2=F][3=X][4=W][5=T][6=S][7=C][8=P]");
+
+    ensure_THROW( ss << test_result("foo", 9, "", test_result::dummy), tut_error );
 }
 
 template<>

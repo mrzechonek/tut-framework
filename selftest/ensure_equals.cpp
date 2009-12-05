@@ -155,11 +155,33 @@ void object::test<13>()
 }
 
 /**
- * Checks positive ensure_equals with iterator range
+ * Checks negative ensure_equals with floating point type (double)
  */
 template<>
 template<>
 void object::test<14>()
+{
+    double lhs = 6.28;
+    double rhs = 3.14;
+    lhs /= 2;
+
+    try
+    {
+        ensure_equals(lhs + 2*std::numeric_limits<double>::epsilon(), rhs);
+        throw runtime_error("double!=double");
+    }
+    catch (const failure &ex)
+    {
+        ensure( string(ex.what()).find("precision") != string::npos );
+    }
+}
+
+/**
+ * Checks positive ensure_equals with iterator range
+ */
+template<>
+template<>
+void object::test<15>()
 {
     int lhs[] = { 4, 1, 2, 3 };
     int rhs[] = { 4, 1, 2, 3 };
@@ -172,7 +194,7 @@ void object::test<14>()
  */
 template<>
 template<>
-void object::test<15>()
+void object::test<16>()
 {
     int lhs[] = { 4, 1, 2, 6, 7, 5 };
     int rhs[] = { 4, 1, 3, 6, 7, 3 };
@@ -227,7 +249,7 @@ std::ostream &operator<<(std::ostream &ss, const std::pair<Key, Value> &pair)
  */
 template<>
 template<>
-void object::test<16>()
+void object::test<17>()
 {
     std::map<Key, Value> lhs;
     lhs[1] = "one";

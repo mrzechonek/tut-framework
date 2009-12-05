@@ -1,4 +1,5 @@
 #include <tut/tut.hpp>
+#include <tut/tut_macros.hpp>
 
 namespace tut
 {
@@ -9,6 +10,16 @@ struct runner_data
     struct dummy
     {
         virtual ~dummy()
+        {
+        }
+    };
+
+    struct dummy_group : public group_base
+    {
+        virtual void rewind() {}
+        virtual bool run_next(test_result &) { return false; }
+        virtual bool run_test(int, test_result &) { return false; }
+        virtual ~dummy_group()
         {
         }
     };
@@ -44,6 +55,13 @@ template<>
 template<>
 void runner_data::object::test<1>()
 {
+}
+
+template<>
+template<>
+void runner_data::object::test<2>()
+{
+    throw rethrown( test_result("group", 2, "test", test_result::ok) );
 }
 
 runner_data::runner_data()
@@ -141,6 +159,45 @@ void object::test<3>()
     ensure_not( tr.run_test("runner_internal", -1, r) );
 
     ensure_not( tr.run_test("runner_internal", 100000, r) );
+}
+
+/**
+ * Checks default callback.
+ */
+template<>
+template<>
+void object::test<4>()
+{
+    set_test_name("checks empty callback");
+    tut::callback cb;
+    tr.set_callback(&cb);
+
+    tr.run_tests();
+    ensure( cb.all_ok() );
+}
+
+/**
+ * Checks group operations.
+ */
+template<>
+template<>
+void object::test<5>()
+{
+    set_test_name("checks group operations");
+
+    dummy_group gr;
+    ensure_THROW( tr.register_group("dummy", NULL), tut_error );
+    tr.register_group("dummy1", &gr);
+    tr.register_group("dummy2", &gr);
+    ensure_THROW( tr.register_group("dummy2", &gr), tut_error );
+
+    tut::groupnames gn;
+    gn.push_back("dummy1");
+    gn.push_back("dummy2");
+    gn.push_back("runner_internal");
+
+    tut::groupnames tg = tr.list_groups();
+    ensure_equals(tg.begin(), tg.end(), gn.begin(), gn.end());
 }
 
 }

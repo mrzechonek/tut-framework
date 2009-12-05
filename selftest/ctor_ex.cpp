@@ -38,7 +38,7 @@ struct ctor_ex
     {
         dummy()
         {
-            throw runtime_error("dummy has throwed an exception");
+            throw runtime_error("dummy has thrown an exception");
         }
 
         virtual ~dummy()
@@ -72,7 +72,7 @@ struct ctor_ex2
         {
             if (cnt++ == 1)
             {
-                throw runtime_error("dummy has throwed an exception");
+                throw runtime_error("dummy has thrown an exception");
             }
         }
 

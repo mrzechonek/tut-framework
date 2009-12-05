@@ -1,4 +1,5 @@
 #include <tut/tut.hpp>
+#include <tut/tut_macros.hpp>
 #include <string>
 #include <sstream>
 #include <stdexcept>

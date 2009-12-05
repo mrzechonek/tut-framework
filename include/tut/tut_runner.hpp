@@ -134,9 +134,6 @@ public:
         if (groups_.find(name) != groups_.end())
         {
             std::string msg("attempt to add already existent group " + name);
-            // this exception terminates application so we use cerr also
-            // TODO: should this message appear in stream?
-            std::cerr << msg << std::endl;
             throw tut_error(msg);
         }
 
@@ -189,12 +186,9 @@ public:
     const groupnames list_groups() const
     {
         groupnames ret;
-        const_iterator i = groups_.begin();
-        const_iterator e = groups_.end();
-        while (i != e)
+        for(const_iterator i = groups_.begin(); i != groups_.end(); ++i)
         {
             ret.push_back(i->first);
-            ++i;
         }
         return ret;
     }

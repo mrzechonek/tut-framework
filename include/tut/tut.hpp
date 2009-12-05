@@ -46,7 +46,7 @@ public:
      * Default constructor
      */
     test_object()
-        : called_method_was_a_dummy_test_(true),
+        : called_method_was_a_dummy_test_(false),
           current_test_id_(0),
           current_test_name_()
     {
@@ -86,7 +86,6 @@ public:
      * Used to detect usused test numbers and avoid unnecessary
      * test object creation which may be time-consuming depending
      * on operations described in Data::Data() and Data::~Data().
-     * TODO: replace with throwing special exception from default test.
      */
     bool called_method_was_a_dummy_test_;
 
@@ -149,8 +148,10 @@ class test_group : public group_base, public test_group_posix
     enum seh_result
     {
         SEH_OK,
+#if defined(TUT_USE_SEH)
         SEH_CTOR,
         SEH_TEST,
+#endif
         SEH_DUMMY
     };
 
@@ -208,11 +209,16 @@ class test_group : public group_base, public test_group_posix
         {
             try
             {
+#if defined(TUT_USE_SEH)
                 if (delete_obj() == false)
                 {
                     throw warning("destructor of test object raised"
                         " an SEH exception");
                 }
+#else
+                bool d = delete_obj();
+                assert(d && "delete failed with SEH disabled: runtime bug?");
+#endif
             }
             catch (const std::exception& ex)
             {
@@ -379,6 +385,7 @@ public:
         {
             switch (run_test_seh_(ti->second, obj, current_test_name, ti->first))
             {
+#if defined(TUT_USE_SEH)
                 case SEH_CTOR:
                     throw bad_ctor("seh");
                     break;
@@ -386,7 +393,7 @@ public:
                 case SEH_TEST:
                     throw seh("seh");
                     break;
-
+#endif
                 case SEH_DUMMY:
                     tr.result = test_result::dummy;
                     break;
@@ -444,12 +451,12 @@ public:
         __try
         {
 #endif
-        if (obj.get() == 0)
-        {
-            reset_holder_(obj);
-        }
+            if (obj.get() == 0)
+            {
+                reset_holder_(obj);
+            }
 
-        obj->called_method_was_a_dummy_test_ = false;
+            obj->called_method_was_a_dummy_test_ = false;
 
 #if defined(TUT_USE_SEH)
 
@@ -467,15 +474,15 @@ public:
             }
 #endif
 
-        if (obj->called_method_was_a_dummy_test_)
-        {
-            // do not call obj.release(); reuse object
-            return SEH_DUMMY;
-        }
+            if (obj->called_method_was_a_dummy_test_)
+            {
+                // do not call obj.release(); reuse object
+                return SEH_DUMMY;
+            }
 
-        current_test_name = obj->get_test_name();
-        obj.permit_throw();
-        obj.release();
+            current_test_name = obj->get_test_name();
+            obj.permit_throw();
+            obj.release();
 #if defined(TUT_USE_SEH)
         }
         __except(handle_seh_(::GetExceptionCode()))

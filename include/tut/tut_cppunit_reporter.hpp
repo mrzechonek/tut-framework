@@ -21,35 +21,6 @@ class cppunit_reporter : public tut::callback
     std::string filename_;
     std::ostream *stream_;
 
-    std::string encode(const std::string & text)
-    {
-        std::string out;
-
-        for (unsigned int i=0; i<text.length(); ++i) {
-            char c = text[i];
-            switch (c) {
-                case '<':
-                    out += "&lt;";
-                    break;
-                case '>':
-                    out += "&gt;";
-                    break;
-                case '&':
-                    out += "&amp;";
-                    break;
-                case '\'':
-                    out += "&apos;";
-                    break;
-                case '"':
-                    out += "&quot;";
-                    break;
-                default:
-                    out += c;
-            }
-        }
-
-        return out;
-    }
 
     cppunit_reporter(const cppunit_reporter &);
     cppunit_reporter &operator=(const cppunit_reporter &);
@@ -79,6 +50,7 @@ public:
 
     void test_completed(const tut::test_result& tr)
     {
+        assert(tr.result != test_result::dummy );
         if ( (tr.result == test_result::ok) ||
              (tr.result == test_result::skipped) )
         {
@@ -101,7 +73,7 @@ public:
 
         if(stream_ == NULL)
         {
-            file.open(filename_.c_str(), std::ios::in | std::ios::trunc);
+            file.open(filename_.c_str(), std::ios::out | std::ios::trunc);
             if (!file.good()) {
                 throw tut_error("Cannot open output file `" + filename_ + "`");
             }
@@ -109,111 +81,129 @@ public:
             stream_ = &file;
         }
 
-        try
+        *stream_ << "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>" << std::endl
+                 << "<TestRun>" << std::endl;
+
+        if (failed_tests_.size() > 0)
         {
-            *stream_ << "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>" << std::endl
-                     << "<TestRun>" << std::endl;
+            *stream_ << "  <FailedTests>" << std::endl;
 
-            if (failed_tests_.size() > 0)
+            for (unsigned int i=0; i<failed_tests_.size(); i++)
             {
-                *stream_ << "  <FailedTests>" << std::endl;
-
-                for (unsigned int i=0; i<failed_tests_.size(); i++)
+                switch (failed_tests_[i].result)
                 {
-                    switch (failed_tests_[i].result)
-                    {
-                        case test_result::fail:
-                            failure_type = "Assertion";
-                            failure_msg  = "";
-                            failures++;
-                            break;
-                        case test_result::ex:
-                            failure_type = "Assertion";
-                            failure_msg  = "Thrown exception: " + failed_tests_[i].exception_typeid + '\n';
-                            failures++;
-                            break;
-                        case test_result::warn:
-                            failure_type = "Assertion";
-                            failure_msg  = "Destructor failed\n";
-                            failures++;
-                            break;
-                        case test_result::term:
-                            failure_type = "Error";
-                            failure_msg  = "Test application terminated abnormally\n";
-                            errors++;
-                            break;
-                        case test_result::ex_ctor:
-                            failure_type = "Error";
-                            failure_msg  = "Constructor has thrown an exception: " + failed_tests_[i].exception_typeid + '\n';
-                            errors++;
-                            break;
-                        case test_result::rethrown:
-                            failure_type = "Assertion";
-                            failure_msg  = "Child failed\n";
-                            failures++;
-                            break;
-                        default:
-                            failure_type = "Error";
-                            failure_msg  = "Unknown test status, this should have never happened. "
-                                           "You may just have found a BUG in TUT CppUnit reporter, please report it immediately.\n";
-                            errors++;
-                            break;
-                    }
-
-                    *stream_ << "    <FailedTest id=\"" << failed_tests_[i].test << "\">" << std::endl
-                             << "      <Name>" << encode(failed_tests_[i].group) + "::" + encode(failed_tests_[i].name) << "</Name>" << std::endl
-                             << "      <FailureType>" << failure_type << "</FailureType>" << std::endl
-                             << "      <Location>" << std::endl
-                             << "        <File>Unknown</File>" << std::endl
-                             << "        <Line>Unknown</Line>" << std::endl
-                             << "      </Location>" << std::endl
-                             << "      <Message>" << encode(failure_msg + failed_tests_[i].message) << "</Message>" << std::endl
-                             << "    </FailedTest>" << std::endl;
+                    case test_result::fail:
+                        failure_type = "Assertion";
+                        failure_msg  = "";
+                        failures++;
+                        break;
+                    case test_result::ex:
+                        failure_type = "Assertion";
+                        failure_msg  = "Thrown exception: " + failed_tests_[i].exception_typeid + '\n';
+                        failures++;
+                        break;
+                    case test_result::warn:
+                        failure_type = "Assertion";
+                        failure_msg  = "Destructor failed\n";
+                        failures++;
+                        break;
+                    case test_result::term:
+                        failure_type = "Error";
+                        failure_msg  = "Test application terminated abnormally\n";
+                        errors++;
+                        break;
+                    case test_result::ex_ctor:
+                        failure_type = "Error";
+                        failure_msg  = "Constructor has thrown an exception: " + failed_tests_[i].exception_typeid + '\n';
+                        errors++;
+                        break;
+                    case test_result::rethrown:
+                        failure_type = "Assertion";
+                        failure_msg  = "Child failed\n";
+                        failures++;
+                        break;
+                    default: // ok, skipped, dummy
+                        failure_type = "Error";
+                        failure_msg  = "Unknown test status, this should have never happened. "
+                                        "You may just have found a BUG in TUT CppUnit reporter, please report it immediately.\n";
+                        errors++;
+                        break;
                 }
 
-                *stream_ << "  </FailedTests>" << std::endl;
+                *stream_ << "    <FailedTest id=\"" << failed_tests_[i].test << "\">" << std::endl
+                            << "      <Name>" << encode(failed_tests_[i].group) + "::" + encode(failed_tests_[i].name) << "</Name>" << std::endl
+                            << "      <FailureType>" << failure_type << "</FailureType>" << std::endl
+                            << "      <Location>" << std::endl
+                            << "        <File>Unknown</File>" << std::endl
+                            << "        <Line>Unknown</Line>" << std::endl
+                            << "      </Location>" << std::endl
+                            << "      <Message>" << encode(failure_msg + failed_tests_[i].message) << "</Message>" << std::endl
+                            << "    </FailedTest>" << std::endl;
             }
 
-            /* *********************** passed tests ***************************** */
-            if (passed_tests_.size() > 0) {
-                *stream_ << "  <SuccessfulTests>" << std::endl;
-
-                for (unsigned int i=0; i<passed_tests_.size(); i++)
-                {
-                    *stream_ << "    <Test id=\"" << passed_tests_[i].test << "\">" << std::endl
-                             << "      <Name>" << encode(passed_tests_[i].group) + "::" + encode(passed_tests_[i].name) << "</Name>" << std::endl
-                             << "    </Test>" << std::endl;
-                }
-
-                *stream_ << "  </SuccessfulTests>" << std::endl;
-            }
-
-            /* *********************** statistics ***************************** */
-            *stream_ << "  <Statistics>" << std::endl
-                     << "    <Tests>" << (failed_tests_.size() + passed_tests_.size()) << "</Tests>" << std::endl
-                     << "    <FailuresTotal>" << failed_tests_.size() << "</FailuresTotal>" << std::endl
-                     << "    <Errors>" << errors << "</Errors>" << std::endl
-                     << "    <Failures>" << failures << "</Failures>" << std::endl
-                     << "  </Statistics>" << std::endl;
-
-            /* *********************** footer ***************************** */
-            *stream_ << "</TestRun>" << std::endl;
+            *stream_ << "  </FailedTests>" << std::endl;
         }
-        catch(...)
-        {
-            if(stream_ == &file)
+
+        /* *********************** passed tests ***************************** */
+        if (passed_tests_.size() > 0) {
+            *stream_ << "  <SuccessfulTests>" << std::endl;
+
+            for (unsigned int i=0; i<passed_tests_.size(); i++)
             {
-                stream_ = NULL;
+                *stream_ << "    <Test id=\"" << passed_tests_[i].test << "\">" << std::endl
+                            << "      <Name>" << encode(passed_tests_[i].group) + "::" + encode(passed_tests_[i].name) << "</Name>" << std::endl
+                            << "    </Test>" << std::endl;
             }
 
-            throw;
+            *stream_ << "  </SuccessfulTests>" << std::endl;
         }
+
+        /* *********************** statistics ***************************** */
+        *stream_ << "  <Statistics>" << std::endl
+                    << "    <Tests>" << (failed_tests_.size() + passed_tests_.size()) << "</Tests>" << std::endl
+                    << "    <FailuresTotal>" << failed_tests_.size() << "</FailuresTotal>" << std::endl
+                    << "    <Errors>" << errors << "</Errors>" << std::endl
+                    << "    <Failures>" << failures << "</Failures>" << std::endl
+                    << "  </Statistics>" << std::endl;
+
+        /* *********************** footer ***************************** */
+        *stream_ << "</TestRun>" << std::endl;
     }
 
     virtual bool all_ok() const
     {
         return failed_tests_.empty();
-    };
+    }
+
+    static std::string encode(const std::string & text)
+    {
+        std::string out;
+
+        for (unsigned int i=0; i<text.length(); ++i) {
+            char c = text[i];
+            switch (c) {
+                case '<':
+                    out += "&lt;";
+                    break;
+                case '>':
+                    out += "&gt;";
+                    break;
+                case '&':
+                    out += "&amp;";
+                    break;
+                case '\'':
+                    out += "&apos;";
+                    break;
+                case '"':
+                    out += "&quot;";
+                    break;
+                default:
+                    out += c;
+            }
+        }
+
+        return out;
+    }
 };
 
 }
