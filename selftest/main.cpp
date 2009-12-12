@@ -1,5 +1,6 @@
 #include <tut/tut.hpp>
 #include <tut/tut_console_reporter.hpp>
+#include <tut/tut_cppunit_reporter.hpp>
 #include <tut/tut_main.hpp>
 #include <tut/tut_macros.hpp>
 #include <iostream>
@@ -98,7 +99,15 @@ namespace tut
 int main(int argc, const char *argv[])
 {
     tut::console_reporter reporter;
+    tut::cppunit_reporter xreporter("self_test.xml");
     tut::runner.get().set_callback(&reporter);
+
+    if(argc>1 && std::string(argv[1]) == "-x")
+    {
+        tut::runner.get().insert_callback(&xreporter);
+        argc--;
+        argv++;
+    }
 
     try
     {

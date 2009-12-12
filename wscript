@@ -18,6 +18,7 @@ def set_options(opt):
     global trues
     trues = ('TRUE', 'True', 'true', 'ON', 'On', 'on', '1', True)
 
+    opt.add_option('--test', action='store_true', help='Run self-tests after the build (off by default)', default=False)
 def configure(conf):
     conf.check_tool('g++')
 
@@ -70,7 +71,14 @@ def configure(conf):
     dest.write('Cflags: -I${includedir}\n')
     dest.close()
 
+def test(bld):
+    if Options.options.test:
+        cmd = os.path.join(bld.bdir, bld.env.variant(), 'self_test')
+        Utils.exec_command(cmd)
+
 def build(bld):
+    bld.add_post_fun(test)
+
     libtut = bld.new_task_gen(features='cxx', includes='include', export_incdirs = 'include', target='tut')
     # old headers
     bld.install_files( os.path.join('${PREFIX}', 'include'),
