@@ -39,8 +39,8 @@ void object::test<1>()
     ensure_equals(Traits::div(0, max), 0.0);
     ensure_equals(Traits::div(0, -max), -0.0);
 
-    ensure_equals(Traits::div(1,0), INFINITY);
-    ensure_equals(Traits::div(-1,0), -INFINITY);
+    ensure_equals(Traits::div(1,0),   std::numeric_limits<double>::infinity());
+    ensure_equals(Traits::div(-1,0), -std::numeric_limits<double>::infinity());
 
     ensure_equals(Traits::div(1,2), 0.5);
 }
@@ -63,8 +63,8 @@ void object::test<2>()
     ensure_equals(Traits::div(0.0, -max), -0.0);
     ensure("0/0 is not a number", Traits::div(0.0, 0.0) != 0.0);
 
-    ensure_equals(Traits::div(1.0,0), INFINITY);
-    ensure_equals(Traits::div(-1.0,0), -INFINITY);
+    ensure_equals(Traits::div(1.0,0),   std::numeric_limits<double>::infinity());
+    ensure_equals(Traits::div(-1.0,0), -std::numeric_limits<double>::infinity());
 
     ensure_equals(Traits::div(min,2.0), min);
     ensure_equals(Traits::div(max,0.5), max);

@@ -7,7 +7,6 @@
 #define TUT_Float_H_GUARD
 
 #include <limits>
-#include <cmath>
 #include <iostream>
 
 namespace tut
@@ -65,7 +64,7 @@ namespace tut
                     return zero;
 
                 if(divisor == zero)
-                    return sig(number) * INFINITY;
+                    return sig(number) * std::numeric_limits<Result>::infinity();
 
                 assert(zero < number);
                 assert(zero < divisor);
