@@ -58,7 +58,7 @@ namespace tut
                 static_cast<void>(static_check);
 
                 if(number == zero && divisor == zero)
-                    return NAN;
+                    return std::numeric_limits<Result>::quiet_NaN();
 
                 if(number == zero)
                     return zero;
