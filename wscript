@@ -15,19 +15,29 @@ def set_options(opt):
     opt.add_option('--with-rtti',  action='store', help='Enable RTTI (on by default)', default=True)
     opt.add_option('--with-seh',   action='store', help='Build with SEH extensions for win32 (off by default)', default=False)
     opt.add_option('--with-posix', action='store', help='Build with POSIX extensions (off by default)', default=False)
+
+    if Utils.unversioned_sys_platform() == 'win32':
+        opt.add_option('--toolset',  action='store', help='Force compiler toolset (default is msvc)', default='msvc')
+    else:
+        opt.add_option('--toolset',  action='store', help='Force compiler toolset (default is g++)', default='g++')
+
     global trues
     trues = ('TRUE', 'True', 'true', 'ON', 'On', 'on', '1', True)
 
     opt.add_option('--test', action='store_true', help='Run self-tests after the build (off by default)', default=False)
 def configure(conf):
-    conf.check_tool('g++')
-
-    conf.env.PLATFORM = Utils.unversioned_sys_platform()
-    conf.env.CPPFLAGS = [ '-O2', '-Wall', '-Wextra', '-Weffc++', '-Werror', '-ftemplate-depth-100' ]
 
     if Options.options.debug:
-        conf.env.CPPFLAGS += [ '-O0', '-g' ]
         conf.env.set_variant('debug')
+
+    conf.env.PLATFORM = Utils.unversioned_sys_platform()
+
+    conf.check_tool(Options.options.toolset)
+
+    if Options.options.toolset == 'g++':
+        conf.env.CPPFLAGS = [ '-O2', '-Wall', '-Wextra', '-Weffc++', '-Werror', '-ftemplate-depth-100' ]
+        if Options.options.debug:
+            conf.env.CPPFLAGS += [ '-O0', '-g' ]
 
     global trues
 
@@ -41,7 +51,7 @@ def configure(conf):
         conf.define_cond('TUT_USE_RTTI', 1)
 
     print 
-    print 'Configured for %s, variant %s' % ( Utils.unversioned_sys_platform(), conf.env.variant() )
+    print 'Configured for %s, variant %s, using toolset %s' % ( Utils.unversioned_sys_platform(), conf.env.variant(), Options.options.toolset )
     print '    Installation directory                   : ', conf.env.PREFIX
     print '    POSIX extensions                         : ', conf.is_defined('TUT_USE_POSIX')
     print '    Win32 structured exception handling (SEH): ', conf.is_defined('TUT_USE_SEH')
