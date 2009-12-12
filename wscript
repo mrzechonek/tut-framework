@@ -73,7 +73,7 @@ def configure(conf):
 
 def test(bld):
     if Options.options.test:
-        cmd = os.path.join(bld.bdir, bld.env.variant(), 'self_test')
+        cmd = os.path.join(bld.bdir, bld.env.variant(), 'self_test') + " -x"
         Utils.exec_command(cmd)
 
 def build(bld):
