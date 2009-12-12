@@ -107,7 +107,7 @@ void object::test<2>()
     ensure(repo.all_ok());
     ensure_equals( actual.begin(), actual.end(), expected.begin(), expected.end() );
 
-    remove("cppunit_reporter.log");
+    ensure_equals( remove("cppunit_reporter.log"), 0);
 }
 
 template<>

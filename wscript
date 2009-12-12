@@ -39,6 +39,9 @@ def configure(conf):
         if Options.options.debug:
             conf.env.CPPFLAGS += [ '-O0', '-g' ]
 
+    if Options.options.toolset == 'msvc':
+        conf.env.CPPFLAGS += [ '/DNOMINMAX' ]
+
     global trues
 
     if Options.options.with_posix in trues:
