@@ -307,7 +307,7 @@ namespace tut
         {
             throw rethrown( test_result("group", 1, "test", test_result::ex_ctor) );
         }
-        catch(const failure &ex)
+        catch(const rethrown &ex)
         {
             ensure_equals(ex.result(), test_result::rethrown);
             ensure_equals(ex.tr.result, test_result::ex_ctor);

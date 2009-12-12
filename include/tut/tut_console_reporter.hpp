@@ -208,12 +208,12 @@ public:
                 {
                     if (tr.result == test_result::fail)
                     {
-                        os << "     failed assertion: \"" << tr.message << "\""
+                        os << "     failed assertion: `" << tr.message << "`"
                             << std::endl;
                     }
                     else
                     {
-                        os << "     message: \"" << tr.message << "\""
+                        os << "     message: `" << tr.message << "`"
                             << std::endl;
                     }
                 }
