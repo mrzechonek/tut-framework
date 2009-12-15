@@ -32,6 +32,9 @@
 namespace tut
 {
 
+template <class, int>
+class test_group;
+
 /**
  * Test object. Contains data test run upon and default test method
  * implementation. Inherited from Data to allow tests to
@@ -40,6 +43,19 @@ namespace tut
 template <class Data>
 class test_object : public Data, public test_object_posix
 {
+    template<class D, int M>
+    friend class test_group;
+
+    void set_test_group(const std::string &group)
+    {
+        current_test_group_ = group;
+    }
+
+    void set_test_id(int current_test_id)
+    {
+        current_test_id_ = current_test_id;
+    }
+
 public:
 
     /**
@@ -48,7 +64,8 @@ public:
     test_object()
         : called_method_was_a_dummy_test_(false),
           current_test_id_(0),
-          current_test_name_()
+          current_test_name_(),
+          current_test_group_()
     {
     }
 
@@ -62,9 +79,9 @@ public:
         return current_test_name_;
     }
 
-    void set_test_id(int current_test_id)
+    const std::string& get_test_group() const
     {
-        current_test_id_ = current_test_id;
+        return current_test_group_;
     }
 
     int get_test_id() const
@@ -96,6 +113,7 @@ public:
 private:
     int             current_test_id_;
     std::string     current_test_name_;
+    std::string     current_test_group_;
 };
 
 
@@ -464,6 +482,7 @@ public:
             {
 #endif
                 obj.get()->set_test_id(current_test_id);
+                obj.get()->set_test_group(name_);
                 (obj.get()->*tm)();
 #if defined(TUT_USE_SEH)
             }

@@ -177,4 +177,12 @@ void set_test_name_tests::test < 4 > ()
     ensure_equals("test name", callback.current_test_name, "seh");
 }
 #endif // TUT_USE_SEH
+
+template < >
+template < >
+void set_test_name_tests::test < 5 > ()
+{
+    ensure_equals(get_test_group(), "set_test_name");
+}
+
 }
