@@ -55,5 +55,9 @@ catch(...)  \
     fail(#x " has thrown unexpected unknown exception"); \
 }
 
+#ifdef __COUNTER__
+#define TUT_TESTCASE(object) template<> template<> void object::test<__COUNTER__>()
+#endif
+
 #endif
 

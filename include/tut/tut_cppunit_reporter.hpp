@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <stdexcept>
+#include <memory>
 
 namespace tut
 {
@@ -18,8 +19,8 @@ class cppunit_reporter : public tut::callback
 {
     std::vector<tut::test_result> failed_tests_;
     std::vector<tut::test_result> passed_tests_;
-    std::string filename_;
-    std::ostream *stream_;
+    const std::string filename_;
+    std::auto_ptr<std::ostream> stream_;
 
 
     cppunit_reporter(const cppunit_reporter &);
@@ -30,8 +31,11 @@ public:
         : failed_tests_(),
           passed_tests_(),
           filename_(filename),
-          stream_(NULL)
+          stream_(new std::ofstream(filename_.c_str()))
     {
+        if (!stream_->good()) {
+            throw tut_error("Cannot open output file `" + filename_ + "`");
+        }
     }
 
     explicit cppunit_reporter(std::ostream &stream)
@@ -40,6 +44,14 @@ public:
           filename_(),
           stream_(&stream)
     {
+    }
+
+    ~cppunit_reporter()
+    {
+        if(filename_.empty())
+        {
+            stream_.release();
+        }
     }
 
     void run_started()
@@ -68,18 +80,6 @@ public:
         int failures = 0;
         std::string failure_type;
         std::string failure_msg;
-
-        std::ofstream file;
-
-        if(stream_ == NULL)
-        {
-            file.open(filename_.c_str(), std::ios::out | std::ios::trunc);
-            if (!file.good()) {
-                throw tut_error("Cannot open output file `" + filename_ + "`");
-            }
-
-            stream_ = &file;
-        }
 
         *stream_ << "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>" << std::endl
                  << "<TestRun>" << std::endl;
@@ -125,7 +125,7 @@ public:
                     default: // ok, skipped, dummy
                         failure_type = "Error";
                         failure_msg  = "Unknown test status, this should have never happened. "
-                                        "You may just have found a BUG in TUT CppUnit reporter, please report it immediately.\n";
+                                       "You may just have found a bug in TUT, please report it immediately.\n";
                         errors++;
                         break;
                 }
@@ -175,6 +175,12 @@ public:
         return failed_tests_.empty();
     }
 
+    /**
+     * \brief Encodes text to XML
+     * XML-reserved characters (e.g. "<") are encoded according to specification
+     * @param text text to be encoded
+     * @return encoded string
+     */
     static std::string encode(const std::string & text)
     {
         std::string out;

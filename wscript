@@ -10,22 +10,28 @@ import glob
 import os
 
 def set_options(opt):
-    opt.tool_options('compiler_cxx')
-    opt.add_option('--debug',      action='store_true', help='Build debug variant', default=False)
-    opt.add_option('--with-rtti',  action='store', help='Enable RTTI (on by default)', default=True)
-    opt.add_option('--with-seh',   action='store', help='Build with SEH extensions for win32 (off by default)', default=False)
-    opt.add_option('--with-posix', action='store', help='Build with POSIX extensions (off by default)', default=False)
-
-    if Utils.unversioned_sys_platform() == 'win32':
-        opt.add_option('--toolset',  action='store', help='Force compiler toolset (default is msvc)', default='msvc')
-    else:
-        opt.add_option('--toolset',  action='store', help='Force compiler toolset (default is g++)', default='g++')
-
     global trues
     trues = ('TRUE', 'True', 'true', 'ON', 'On', 'on', '1', True)
 
-    opt.add_option('--test', action='store_true', help='Run self-tests after the build (off by default)', default=False)
+    if Utils.unversioned_sys_platform() == 'win32':
+        default_tool = 'msvc'
+    else:
+        default_tool = 'g++'
+
+    gr = opt.add_option_group('configuration variant options')
+    gr.add_option('--debug',      action='store_true', help='Build debug variant', default=False)
+    gr.add_option('--toolset',    action='store',      help='Force compiler toolset (default is '+default_tool+')', default=default_tool)
+    gr.add_option('--with-rtti',  action='store',      help='Enable RTTI (on by default)', default=True)
+    gr.add_option('--with-seh',   action='store',      help='Build with SEH extensions for win32 (off by default)', default=False)
+    gr.add_option('--with-posix', action='store',      help='Build with POSIX extensions (off by default)', default=False)
+
+    gr = opt.add_option_group('build options')
+    gr.add_option('--test',       action='store_true', help='Run self-tests after the build (off by default)', default=False)
+    gr.add_option('--coverage',   action='store_true', help='Produce test coverage report (off by default, implies --debug and --test)', default=False)
+
 def configure(conf):
+    if Options.options.coverage:
+        Options.options.debug = True
 
     if Options.options.debug:
         conf.env.set_variant('debug')
@@ -85,9 +91,17 @@ def configure(conf):
     dest.close()
 
 def test(bld):
-    if Options.options.test:
-        cmd = os.path.join(bld.bdir, bld.env.variant(), 'self_test') + " -x"
-        Utils.exec_command(cmd)
+
+    if Options.options.coverage:
+        cmd = os.path.join(bld.bdir, bld.env.variant(), 'self_test')
+        Utils.exec_command("bcov " + cmd)
+        try:os.makedirs('bcovreport')
+        except:pass
+        Utils.exec_command("bcov-report .bcovdump bcovreport")
+    else:
+        if Options.options.test:
+            cmd = os.path.join(bld.bdir, bld.env.variant(), 'self_test') + " -x"
+            Utils.exec_command(cmd)
 
 def build(bld):
     bld.add_post_fun(test)

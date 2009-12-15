@@ -1,8 +1,8 @@
 #ifndef TUT_XML_REPORTER
 #define TUT_XML_REPORTER
 #include <tut/tut_config.hpp>
-
 #include <tut/tut.hpp>
+#include <tut/tut_cppunit_reporter.hpp>
 #include <cassert>
 #include <string>
 #include <fstream>
@@ -19,62 +19,12 @@ namespace tut
  */
 class xml_reporter : public tut::callback
 {
-protected:
     typedef std::vector<tut::test_result> TestResults;
     typedef std::map<std::string, TestResults> TestGroups;
 
-    TestGroups all_tests; /// holds all test results
-    std::string filename; /// filename base
-
-    /**
-     * \brief Initializes object
-     * Resets counters and clears all stored test results.
-     */
-    virtual void init()
-    {
-        ok_count = 0;
-        exceptions_count = 0;
-        failures_count = 0;
-        terminations_count = 0;
-        warnings_count = 0;
-        all_tests.clear();
-    }
-
-    /**
-     * \brief Encodes text to XML
-     * XML-reserved characters (e.g. "<") are encoded according to specification
-     * @param text text to be encoded
-     * @return encoded string
-     */
-    virtual std::string encode(const std::string & text)
-    {
-        std::string out;
-
-        for (unsigned int i=0; i<text.length(); ++i) {
-            char c = text[i];
-            switch (c) {
-                case '<':
-                    out += "&lt;";
-                    break;
-                case '>':
-                    out += "&gt;";
-                    break;
-                case '&':
-                    out += "&amp;";
-                    break;
-                case '\'':
-                    out += "&apos;";
-                    break;
-                case '"':
-                    out += "&quot;";
-                    break;
-                default:
-                    out += c;
-            }
-        }
-
-        return out;
-    }
+    TestGroups all_tests_; /// holds all test results
+    const std::string filename_; /// filename base
+    std::auto_ptr<std::ostream> stream_;
 
     /**
      * \brief Builds "testcase" XML entity with given parameters
@@ -84,7 +34,7 @@ protected:
      * @param failure_msg failure message to be reported (empty, if test passed)
      * @return string with \<testcase\> entity
      */
-    virtual std::string xml_build_testcase(const tut::test_result & tr, const std::string & failure_type,
+    std::string xml_build_testcase(const tut::test_result & tr, const std::string & failure_type,
                                            const std::string & failure_msg, int pid = 0)
     {
         using std::endl;
@@ -95,15 +45,15 @@ protected:
         if ( (tr.result == test_result::ok) ||
              (tr.result == test_result::skipped) )
         {
-            out << "  <testcase classname=\"" << encode(tr.group) << "\" name=\"" << encode(tr.name) << "\" />";
+            out << "    <testcase classname=\"" << cppunit_reporter::encode(tr.group) << "\" name=\"" << cppunit_reporter::encode(tr.name) << "\"/>";
         }
         else
         {
-            string err_msg = encode(failure_msg + tr.message);
+            string err_msg = cppunit_reporter::encode(failure_msg + tr.message);
 
             string tag; // determines tag name: "failure" or "error"
             if ( tr.result == test_result::fail || tr.result == test_result::warn ||
-                 tr.result == test_result::ex || tr.result == test_result::ex_ctor )
+                 tr.result == test_result::ex || tr.result == test_result::ex_ctor || tr.result == test_result::rethrown )
             {
                 tag = "failure";
             }
@@ -112,8 +62,8 @@ protected:
                 tag = "error";
             }
 
-            out << "  <testcase classname=\"" << encode(tr.group) << "\" name=\"" << encode(tr.name) << "\">" << endl;
-            out << "    <" << tag << " message=\"" << err_msg << "\"" << " type=\"" << failure_type << "\"";
+            out << "    <testcase classname=\"" << cppunit_reporter::encode(tr.group) << "\" name=\"" << cppunit_reporter::encode(tr.name) << "\">" << endl;
+            out << "      <" << tag << " message=\"" << err_msg << "\"" << " type=\"" << failure_type << "\"";
 #if defined(TUT_USE_POSIX)
             if(pid != getpid())
             {
@@ -123,7 +73,7 @@ protected:
             (void)pid;
 #endif
             out << ">" << err_msg << "</" << tag << ">" << endl;
-            out << "  </testcase>";
+            out << "    </testcase>";
         }
 
         return out.str();
@@ -136,17 +86,17 @@ protected:
      * @param failures number of failures to be reported
      * @param total total number of tests to be reported
      * @param name test suite name
-     * @param testcases encoded XML string containing testcases
+     * @param testcases cppunit_reporter::encoded XML string containing testcases
      * @return string with \<testsuite\> entity
      */
-    virtual std::string xml_build_testsuite(int errors, int failures, int total,
+    std::string xml_build_testsuite(int errors, int failures, int total,
                                             const std::string & name, const std::string & testcases)
     {
         std::ostringstream out;
 
-        out << "<testsuite errors=\"" << errors << "\" failures=\"" << failures << "\" tests=\"" << total << "\" name=\"" << encode(name) << "\">" << std::endl;
+        out << "  <testsuite errors=\"" << errors << "\" failures=\"" << failures << "\" tests=\"" << total << "\" name=\"" << cppunit_reporter::encode(name) << "\">" << std::endl;
         out << testcases;
-        out << "</testsuite>";
+        out << "  </testsuite>";
 
         return out.str();
     }
@@ -163,44 +113,38 @@ public:
      * @param filename base filename
      * @see setFilenameBase
      */
-    xml_reporter(const std::string & _filename = "")
-        : all_tests(),
-          filename(),
+    xml_reporter(const std::string & filename = "")
+        : all_tests_(),
+          filename_(filename),
+          stream_(new std::ofstream(filename_.c_str())),
           ok_count(0),
           exceptions_count(0),
           failures_count(0),
           terminations_count(0),
           warnings_count(0)
     {
-        init();
-        setFilenameBase(_filename);
+        if (!stream_->good()) {
+            throw tut_error("Cannot open output file `" + filename_ + "`");
+        }
     }
 
-    /**
-     * \brief Sets filename base for output
-     * @param _filename filename base
-     * Example usage:
-     * @code
-     * xml_reporter reporter;
-     * reporter.setFilenameBase("my_xml");
-     * @endcode
-     * The above code will instruct reporter to create my_xml_1.xml file for the first test group,
-     * my_xml_2.xml file for the second, and so on.
-     */
-    virtual void setFilenameBase(const std::string & _filename)
+    xml_reporter(std::ostream & stream)
+        : all_tests_(),
+          filename_(),
+          stream_(&stream),
+          ok_count(0),
+          exceptions_count(0),
+          failures_count(0),
+          terminations_count(0),
+          warnings_count(0)
     {
-        if (_filename == "")
-        {
-            filename = "testResult";
-        }
-        else
-        {
-            if (_filename.length() > 200)
-            {
-                throw(std::runtime_error("Filename too long!"));
-            }
+    }
 
-            filename = _filename;
+    ~xml_reporter()
+    {
+        if(filename_.empty())
+        {
+            stream_.release();
         }
     }
 
@@ -210,7 +154,12 @@ public:
      */
     virtual void run_started()
     {
-        init();
+        ok_count = 0;
+        exceptions_count = 0;
+        failures_count = 0;
+        terminations_count = 0;
+        warnings_count = 0;
+        all_tests_.clear();
     }
 
     /**
@@ -244,7 +193,7 @@ public:
         } // switch
 
         // add test result to results table
-        (all_tests[tr.group]).push_back(tr);
+        all_tests_[tr.group].push_back(tr);
     }
 
     /**
@@ -254,47 +203,37 @@ public:
      */
     virtual void run_completed()
     {
-        using std::endl;
-        using std::string;
-
-        static int number = 1;  // results file sequence number (testResult_<number>.xml)
+        /* *********************** header ***************************** */
+        *stream_ << "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" << std::endl;
+        *stream_ << "<testsuites>" << std::endl;
 
         // iterate over all test groups
-        TestGroups::const_iterator tgi;
-        for (tgi = all_tests.begin(); tgi != all_tests.end(); ++tgi) {
+        for (TestGroups::const_iterator tgi = all_tests_.begin(); tgi != all_tests_.end(); ++tgi)
+        {
             /* per-group statistics */
             int passed = 0;         // passed in single group
             int exceptions = 0;     // exceptions in single group
             int failures = 0;       // failures in single group
             int terminations = 0;   // terminations in single group
             int warnings = 0;       // warnings in single group
-            int errors = 0;     // errors in single group
+            int errors = 0;         // errors in single group
 
-            /* generate output filename */
-            char fn[256];
-            sprintf(fn, "%s_%d.xml", filename.c_str(), number++);
-
-            std::ofstream xmlfile;
-            xmlfile.open(fn, std::ios::in | std::ios::trunc);
-            if (!xmlfile.is_open()) {
-                throw (std::runtime_error("Cannot open file for output"));
-            }
-
-            /* *********************** header ***************************** */
-            xmlfile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
 
             // output is written to string stream buffer, because JUnit format <testsuite> tag
             // contains statistics, which aren't known yet
             std::ostringstream out;
 
             // iterate over all test cases in the current test group
-            TestResults::const_iterator tri;
-            for (tri = (*tgi).second.begin(); tri != (*tgi).second.end(); ++tri) {
-                string failure_type;    // string describing the failure type
-                string failure_msg;     // a string with failure message
+            const TestResults &results = tgi->second;
+            for (TestResults::const_iterator tri = results.begin(); tri != results.end(); ++tri)
+            {
+                std::string failure_type;    // string describing the failure type
+                std::string failure_msg;     // a string with failure message
 
-                switch ((*tri).result) {
+                switch (tri->result)
+                {
                     case test_result::ok:
+                    case test_result::skipped:
                         passed++;
                         break;
                     case test_result::fail:
@@ -304,7 +243,7 @@ public:
                         break;
                     case test_result::ex:
                         failure_type = "Assertion";
-                        failure_msg  = "Thrown exception: " + (*tri).exception_typeid + '\n';
+                        failure_msg  = "Thrown exception: " + tri->exception_typeid + '\n';
                         exceptions++;
                         break;
                     case test_result::warn:
@@ -319,28 +258,27 @@ public:
                         break;
                     case test_result::ex_ctor:
                         failure_type = "Assertion";
-                        failure_msg  = "Constructor has thrown an exception: " + (*tri).exception_typeid + '\n';
+                        failure_msg  = "Constructor has thrown an exception: " + tri->exception_typeid + ".\n";
                         exceptions++;
                         break;
                     case test_result::rethrown:
                         failure_type = "Assertion";
-                        failure_msg  = "Child failed";
+                        failure_msg  = "Child failed.\n";
                         failures++;
                         break;
                     default:
                         failure_type = "Error";
                         failure_msg  = "Unknown test status, this should have never happened. "
-                                "You may just have found a BUG in TUT XML reporter, please report it immediately.\n";
+                                       "You may just have found a bug in TUT, please report it immediately.\n";
                         errors++;
                         break;
                 } // switch
 
 #if defined(TUT_USE_POSIX)
-                out << xml_build_testcase(*tri, failure_type, failure_msg, (*tri).pid) << endl;
+                out << xml_build_testcase(*tri, failure_type, failure_msg, tri->pid) << std::endl;
 #else
-                out << xml_build_testcase(*tri, failure_type, failure_msg) << endl;
+                out << xml_build_testcase(*tri, failure_type, failure_msg) << std::endl;
 #endif
-
             } // iterate over all test cases
 
             // calculate per-group statistics
@@ -348,9 +286,10 @@ public:
             int stat_failures = failures + warnings + exceptions;
             int stat_all = stat_errors + stat_failures + passed;
 
-            xmlfile << xml_build_testsuite(stat_errors, stat_failures, stat_all, (*tgi).first/* name */, out.str()/* testcases */) << endl;
-            xmlfile.close();
+            *stream_ << xml_build_testsuite(stat_errors, stat_failures, stat_all, (*tgi).first/* name */, out.str()/* testcases */) << std::endl;
         } // iterate over all test groups
+
+        *stream_ << "</testsuites>" << std::endl;
     }
 
     /**

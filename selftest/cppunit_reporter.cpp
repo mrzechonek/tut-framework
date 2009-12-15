@@ -24,6 +24,8 @@ struct cppunit_reporter_test
     test_result tr7;
     test_result tr8;
 
+    const std::string filename;
+
     cppunit_reporter_test()
         : tr1("ok",       1, "tr1", test_result::ok),
           tr2("fail",     2, "tr2", test_result::fail,    "", "fail message"),
@@ -32,12 +34,14 @@ struct cppunit_reporter_test
           tr5("term",     5, "tr5", test_result::term,    "", "term message"),
           tr6("skipped",  6, "tr6", test_result::skipped, "", "skipped message"),
           tr7("ctor",     7, "tr7", test_result::ex_ctor, "exception", "ex_ctor message"),
-          tr8("rethrown", 8, "tr8", test_result::rethrown, "exception", "rethrown message")
+          tr8("rethrown", 8, "tr8", test_result::rethrown, "exception", "rethrown message"),
+          filename("cppunit_reporter.log")
     {
     }
 
     virtual ~cppunit_reporter_test()
     {
+        remove(filename.c_str());
     }
 };
 
@@ -81,10 +85,10 @@ void object::test<2>()
     set_test_name("tests empty run report to a file");
 
     {
-        std::ifstream t("cppunit_reporter.log");
-        ensure_equals( "File cppunit_reporter.log exists, remove it before running the test", t.good(), false);
+        std::ifstream t(filename.c_str());
+        ensure_equals( "File "+filename+" exists, remove it before running the test", t.good(), false);
     }
-    cppunit_reporter repo("cppunit_reporter.log");
+    cppunit_reporter repo(filename.c_str());
 
     repo.run_started();
     repo.run_completed();
@@ -100,14 +104,14 @@ void object::test<2>()
         "  </Statistics>\n"
         "</TestRun>\n";
 
-    std::ifstream file("cppunit_reporter.log");
+    std::ifstream file(filename.c_str());
     std::string actual;
     std::copy( std::istreambuf_iterator<char>(file.rdbuf()), std::istreambuf_iterator<char>(), std::back_inserter(actual) );
 
     ensure(repo.all_ok());
     ensure_equals( actual.begin(), actual.end(), expected.begin(), expected.end() );
 
-    ensure_equals( remove("cppunit_reporter.log"), 0);
+    ensure_equals( remove(filename.c_str()), 0);
 }
 
 template<>
