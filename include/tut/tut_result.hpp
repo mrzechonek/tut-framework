@@ -4,8 +4,38 @@
 
 #include <string>
 
+#if defined(TUT_USE_RTTI)
+#if (defined(_MSC_VER) && !defined(_CPPRTTI)) || (defined(__GNUC__) && !defined(__GXX_RTTI))
+#undef TUT_USE_RTTI
+#endif
+#endif
+
+#if defined(TUT_USE_RTTI)
+#include <typeinfo>
+#endif
+
 namespace tut
 {
+
+#if defined(TUT_USE_RTTI)
+template<typename T>
+inline std::string type_name(const T& t)
+{
+    return typeid(t).name();
+}
+#else
+template<typename T>
+inline std::string type_name(const T& t)
+{
+    return "Unknown type, RTTI disabled";
+}
+
+inline std::string type_name(const std::exception&)
+{
+    return "Unknown std::exception, RTTI disabled";
+}
+#endif
+
 
 #if defined(TUT_USE_POSIX)
 struct test_result_posix
@@ -119,7 +149,7 @@ struct test_result : public test_result_posix
           name(test_name),
           result(res),
           message(ex.what()),
-          exception_typeid(typeid(ex).name())
+          exception_typeid(type_name(ex))
     {
     }
 

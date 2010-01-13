@@ -24,7 +24,7 @@ catch(const e &) \
 }                \
 catch(const std::exception &ex)  \
 {           \
-    fail( std::string(#x " has thrown unexpected exception ")+typeid(ex).name()+": "+ex.what()); \
+    fail( std::string(#x " has thrown unexpected exception ")+tut::type_name(ex)+": "+ex.what()); \
 } \
 catch(...)       \
 {                \
@@ -48,7 +48,7 @@ try         \
 }           \
 catch(const std::exception &ex)  \
 {           \
-    fail( std::string(#x " has thrown unexpected exception ")+typeid(ex).name()+": "+ex.what()); \
+    fail( std::string(#x " has thrown unexpected exception ")+tut::type_name(ex)+": "+ex.what()); \
 } \
 catch(...)  \
 {           \

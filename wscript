@@ -11,7 +11,7 @@ import os
 
 def set_options(opt):
     global trues
-    trues = ('TRUE', 'True', 'true', 'ON', 'On', 'on', '1', True)
+    trues = ('TRUE', 'True', 'true', 'ON', 'On', 'on', '1', 'YES', 'Yes', 'yes', True)
 
     if Utils.unversioned_sys_platform() == 'win32':
         default_tool = 'msvc'

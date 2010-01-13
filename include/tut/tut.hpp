@@ -10,7 +10,6 @@
 #include <sstream>
 #include <iterator>
 #include <algorithm>
-#include <typeinfo>
 
 #include "tut_exception.hpp"
 #include "tut_result.hpp"
@@ -429,13 +428,13 @@ public:
         catch (const tut_error& ex)
         {
             tr.result = ex.result();
-            tr.exception_typeid = typeid(ex).name();
+            tr.exception_typeid = ex.type();
             tr.message = ex.what();
         }
         catch (const std::exception& ex)
         {
             tr.result = test_result::ex;
-            tr.exception_typeid = typeid(ex).name();
+            tr.exception_typeid = type_name(ex);
             tr.message = ex.what();
         }
         catch (...)

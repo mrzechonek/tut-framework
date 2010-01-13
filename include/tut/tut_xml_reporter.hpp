@@ -113,7 +113,7 @@ public:
      * @param filename base filename
      * @see setFilenameBase
      */
-    xml_reporter(const std::string & filename = "")
+    xml_reporter(const std::string & filename)
         : all_tests_(),
           filename_(filename),
           stream_(new std::ofstream(filename_.c_str())),

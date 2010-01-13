@@ -22,6 +22,11 @@ struct tut_error : public std::exception
         return test_result::ex;
     }
 
+    virtual std::string type() const
+    {
+        return "tut::tut_error";
+    }
+
     const char* what() const throw()
     {
         return err_msg.c_str();
@@ -47,6 +52,11 @@ struct no_such_group : public tut_error
     {
     }
 
+    virtual std::string type() const
+    {
+        return "tut::no_such_group";
+    }
+
     ~no_such_group() throw()
     {
     }
@@ -60,6 +70,11 @@ struct no_such_test : public tut_error
     explicit no_such_test(const std::string& grp)
         : tut_error(grp)
     {
+    }
+
+    virtual std::string type() const
+    {
+        return "tut::no_such_test";
     }
 
     ~no_such_test() throw()
@@ -83,6 +98,11 @@ struct bad_ctor : public tut_error
         return test_result::ex_ctor;
     }
 
+    virtual std::string type() const
+    {
+        return "tut::bad_ctor";
+    }
+
     ~bad_ctor() throw()
     {
     }
@@ -101,6 +121,11 @@ struct failure : public tut_error
     test_result::result_type result() const
     {
         return test_result::fail;
+    }
+
+    virtual std::string type() const
+    {
+        return "tut::failure";
     }
 
     ~failure() throw()
@@ -123,6 +148,11 @@ struct warning : public tut_error
         return test_result::warn;
     }
 
+    virtual std::string type() const
+    {
+        return "tut::warning";
+    }
+
     ~warning() throw()
     {
     }
@@ -141,6 +171,11 @@ struct seh : public tut_error
     virtual test_result::result_type result() const
     {
         return test_result::term;
+    }
+
+    virtual std::string type() const
+    {
+        return "tut::seh";
     }
 
     ~seh() throw()
@@ -163,6 +198,11 @@ struct rethrown : public failure
         return test_result::rethrown;
     }
 
+    virtual std::string type() const
+    {
+        return "tut::rethrown";
+    }
+
     ~rethrown() throw()
     {
     }
@@ -180,6 +220,11 @@ struct skipped : public tut_error
     virtual test_result::result_type result() const
     {
         return test_result::skipped;
+    }
+
+    virtual std::string type() const
+    {
+        return "tut::skipped";
     }
 
     ~skipped() throw()
