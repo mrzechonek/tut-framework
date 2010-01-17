@@ -110,8 +110,6 @@ void object::test<2>()
 
     ensure(repo.all_ok());
     ensure_equals( actual.begin(), actual.end(), expected.begin(), expected.end() );
-
-    ensure_equals( remove(filename.c_str()), 0);
 }
 
 template<>

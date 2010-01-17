@@ -45,7 +45,7 @@ class test_object : public Data, public test_object_posix
     template<class D, int M>
     friend class test_group;
 
-    void set_test_group(const std::string &group)
+    void set_test_group(const char *group)
     {
         current_test_group_ = group;
     }
