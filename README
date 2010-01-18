@@ -97,12 +97,11 @@ test group can be found in examples/shared_ptr subdirectory of the
 distribution package)
 
 // test_shared_ptr.cpp
-#include <tut/tut/tut.hpppp>
+#include <tut/tut.hpp>
 
 namespace tut
 {
-};
-            
+}
 
 As you see, you need to include TUT header file (as expected) and 
 use namespace tut for tests. You may also use anonymous namespace if 
@@ -119,7 +118,7 @@ from T, so any test can refer to the data in T as its member data.
 For simple test groups (where all data are stored in test local 
 variables) type T is an empty struct.
 
-#include <tut/tut/tut.hpppp>
+#include <tut/tut.hpp>
 
 namespace tut
 {
@@ -127,7 +126,7 @@ namespace tut
   { 
   };
 }
-            
+
 But when tests have complex or repeating creation phase, you may put 
 data members into the T and provide constructor (and, if required, 
 destructor) for it. For each test, a new instance of T will be 
@@ -135,7 +134,7 @@ created. To prepare your test for execution TUT will use default
 constructor. Similarly, after the test has been finished, TUT 
 calls the destructor to clean up T. I.e.:
 
-#include <tut/tut/tut.hpppp>
+#include <tut/tut.hpp>
 
 namespace tut
 {
@@ -151,7 +150,7 @@ namespace tut
   ...
   con->commit();
   ...
-            
+}
 
 What will happen if the constructor throws an exception? TUT will treat 
 it as if test itself failed with exception, so this test will 
@@ -172,19 +171,18 @@ descriptive name, or, alternatively, we may put it into the anonymous
 namespace. The former is more correct, but a descriptive name usually works 
 well too, unless you're too terse in giving names to objects.
 
-#include <tut/tut/tut.hpppp>
+#include <tut/tut.hpp>
 
 namespace tut
 {
     struct shared_ptr_data
     {
-
     };
 
     typedef test_group<shared_ptr_data> tg;
     tg shared_ptr_group("shared_ptr");
-};
-            
+}
+
 As you see, any test group accepts a single parameter - its human-readable 
 name. This name is used to identify the group when a programmer wants to 
 execute all tests or a single test within the group. So this name shall 
@@ -215,8 +213,7 @@ namespace tut
     // test group with maximum 500 tests
     typedef test_group<huge_test_data,500> testgroup;
     testgroup huge_test_testgroup("huge group");
-};
-            
+}
 
 Note also, that your compiler will possibly need a command-line switch 
 or pragma to enlarge recursive instantiation depth. For g++, for 
@@ -254,8 +251,7 @@ namespace tut
     {
         // do nothing test
     }
-};
-        
+}
 
 So far this test does nothing, but it's enough to illustrate the concept.
 
@@ -308,7 +304,6 @@ namespace tut
         ensure("null",def.get() == 0);
     }
 };
-        
 
 That's all! The first line creates shared_ptr. If constructor throws 
 an exception, test will fail (exceptions, including '...', are catched 
@@ -367,7 +362,6 @@ void testobject::test<3>()
     ensure_equals("second copy at sp1",sp1.count(),2);
     ensure_equals("second copy at sp2",sp2.count(),2);
 }
-        
 
 The test checks if the shared_ptr correctly counts references during 
 copy construction. What's interesting here is the template member 
@@ -502,7 +496,7 @@ int main()
   runner.get().run_tests();
   return 0;
 }
-        
+
 That's it. You are now ready to link and run our test application. Do it as often as possible; 
 once a day is a definite must. I hope, TUT will help you to make your application more 
 robust and relieve your testing pain. Feel free to send your questions, suggestions and 
