@@ -1,6 +1,5 @@
 #ifndef TUT_CONSOLE_REPORTER
 #define TUT_CONSOLE_REPORTER
-#include <tut/tut_config.hpp>
 #include <tut/tut.hpp>
 #include <cassert>
 

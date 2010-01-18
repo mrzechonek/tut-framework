@@ -111,7 +111,6 @@ public:
     /**
      * \brief Default constructor
      * @param filename base filename
-     * @see setFilenameBase
      */
     xml_reporter(const std::string & filename)
         : all_tests_(),
@@ -199,7 +198,7 @@ public:
     /**
      * \brief Callback function
      * This function is called when all tests are completed. It generates XML output
-     * to file(s). File name base can be set with \ref setFilenameBase.
+     * to file(s). File name base can be set with constructor.
      */
     virtual void run_completed()
     {

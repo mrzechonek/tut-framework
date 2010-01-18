@@ -24,10 +24,13 @@ faq.*.html:
 authors.*.html:
   sort_info: 8
 
-links.*.html:
+source.*.html:
   sort_info: 9
 
-copyright.*.html:
+links.*.html:
   sort_info: 10
+
+copyright.*.html:
+  sort_info: 11
 
 

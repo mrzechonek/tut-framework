@@ -19,10 +19,16 @@ body
 /* header */
 
 #header h1 {
-    font-size: 40pt;
+    font-size: 28pt;
     font-weight: bold;
     margin: 0;
     padding: 0;
+}
+
+#header h1 img {
+    border: 0;
+    vertical-align: middle;
+    margin-right: 5pt;
 }
 
 /* menu */
@@ -68,7 +74,7 @@ body
 }
 
 #body h1 {
-    font-size: 32pt;
+    font-size: 24pt;
     font-weight: bold;
     margin: 0;
     margin-bottom: 5pt;

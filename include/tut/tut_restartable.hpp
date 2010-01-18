@@ -186,7 +186,7 @@ bool deserialize(std::istream& is, tut::test_result& tr)
     }
     return true;
 }
-};
+}
 
 /**
  * Restartable test runner wrapper.

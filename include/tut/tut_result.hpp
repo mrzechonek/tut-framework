@@ -84,23 +84,19 @@ struct test_result : public test_result_posix
     std::string name;
 
     /**
-     * ok - test finished successfully
-     * fail - test failed with ensure() or fail() methods
-     * ex - test throwed an exceptions
-     * warn - test finished successfully, but test destructor throwed
-     * term - test forced test application to terminate abnormally
+     * result of a test 
      */
     enum result_type
     {
-        ok,
-        fail,
-        ex,
-        warn,
-        term,
-        ex_ctor,
-        rethrown,
-        skipped,
-        dummy
+        ok,       ///< test finished successfully
+        fail,     ///< test failed with ensure() or fail() methods
+        ex,       ///< test throwed an exceptions
+        warn,     ///< test finished successfully, but test destructor throwed
+        term,     ///< test forced test application to terminate abnormally
+        ex_ctor,  ///< 
+        rethrown, ///< 
+        skipped,  ///< 
+        dummy     ///< 
     };
 
     result_type result;

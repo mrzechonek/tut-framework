@@ -567,5 +567,5 @@ inline int handle_seh_(DWORD excode)
 #endif
 }
 
-#endif
+#endif // TUT_H_GUARD
 

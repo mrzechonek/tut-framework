@@ -198,22 +198,24 @@ void object::test<5>()
         std::ifstream t(filename.c_str());
         ensure_equals( "File "+filename+" exists, remove it before running the test", t.good(), false);
     }
-    xml_reporter repo(filename);
+    {
+        xml_reporter repo(filename);
 
-    repo.run_started();
-    repo.run_completed();
+        repo.run_started();
+        repo.run_completed();
 
-    std::string expected =
-        "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n"
-        "<testsuites>\n"
-        "</testsuites>\n";
+        std::string expected =
+            "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n"
+            "<testsuites>\n"
+            "</testsuites>\n";
 
-    std::ifstream file(filename.c_str());
-    std::string actual;
-    std::copy( std::istreambuf_iterator<char>(file.rdbuf()), std::istreambuf_iterator<char>(), std::back_inserter(actual) );
+        std::ifstream file(filename.c_str());
+        std::string actual;
+        std::copy( std::istreambuf_iterator<char>(file.rdbuf()), std::istreambuf_iterator<char>(), std::back_inserter(actual) );
 
-    ensure(repo.all_ok());
-    ensure_equals( actual.begin(), actual.end(), expected.begin(), expected.end() );
+        ensure(repo.all_ok());
+        ensure_equals( actual.begin(), actual.end(), expected.begin(), expected.end() );
+    }
 }
 
 template<>

@@ -6,6 +6,7 @@ template: default.template
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{lang:}">
   <head>
     <title>TUT: C++ Template Unit Test Framework</title>
+    <link rel="shortcut icon" href="tut.ico" />
     <meta name="keywords" content="C++ Unit Test Simple" />
     <meta name="description" content="TUT: C++ Template Unit Test Framework" />
     <meta name="generator" content="webgen - http://webgen.rubyforge.com/" />
@@ -13,7 +14,10 @@ template: default.template
   </head>
   <body>
     <div id="header">
-      <h1>TUT: C++ Template Unit Test Framework</h1>
+      <h1>
+        <a href="http://tut-framework.sourceforge.net/"><img src="tut.png" alt="tut logo"/></a>
+        C++ Template Unit Test Framework
+      </h1>
     </div>
 
     <div id="menu">
