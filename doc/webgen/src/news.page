@@ -3,6 +3,26 @@ title: News
 desc: changelog, releases and whatnot
 ---
 
+Doxygen documentation
+---------------------
+
+Thanks to Achill Hasler, we now have a complete, Doxygen-based, reference manual.
+
+Switch to Waf
+-------------------
+
+The build/installation system has been changed from hand-maintained makefiles to a modern
+alternative, [Waf](http://code.google.com/p/waf/). This means that official process
+of building/installing TUT requires Python. For now Waf scripts used in TUT handle GCC,
+MinGW and various versions of MSVC. Support for Intel/Sun/Borland compilers is not there yet.
+
+TUT is now also somewhat customizable during build/installation, using `./waf configure`
+shell command. You can even check the self-test coverage if you have
+[bcov](http://sourceforge.net/projects/bcov/) installed on your machine.
+
+However, you can still 'just copy the files' using the default `tut_config.hpp`.
+Bear in mind that by doing that you miss much goodies, e.g. generated `pkg-config` file.
+
 TUT-2009-08-30
 --------------
 This is a bugfix release.

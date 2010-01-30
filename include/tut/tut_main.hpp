@@ -51,7 +51,7 @@ namespace tut
  *  }
  * @endcode
  */
-inline bool tut_main(int argc, const char **argv, std::ostream &os = std::cerr)
+inline bool tut_main(int argc, const char * const * const argv, std::ostream &os = std::cerr)
 {
     std::stringstream usage;
     usage << "Usage: " << argv[0] << " [group] [testcase]" << std::endl;
