@@ -10,7 +10,7 @@ doxygen: Doxyfile dox/header.html dox/footer.html dox/doxygen.css dox/main.dox $
 	@doxygen
 
 deploy: all
-	scp out/* khorniszon,tut-framework@web.sourceforge.net:/home/groups/t/tu/tut-framework/htdocs
+	scp -r out/* khorniszon,tut-framework@web.sourceforge.net:/home/groups/t/tu/tut-framework/htdocs
 
 clean:
 	@rm -rf out
