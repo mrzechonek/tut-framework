@@ -1,4 +1,3 @@
-
 APPNAME='tut'
 VERSION='trunk'
 srcdir = '.'
@@ -140,7 +139,8 @@ def test(tst):
     bld = getattr(Utils.g_module,'build_context',Utils.Context)()
     Scripting.build(bld)
 
-    selftest = os.path.join( bld.bdir, bld.env.variant(), 'self_test')
+    # quotes required for paths with spaces
+    selftest = "\"" + os.path.join( bld.bdir, bld.env.variant(), 'self_test') + "\""
 
     if Options.options.coverage:
         if bld.env.variant() != 'debug':
@@ -156,3 +156,4 @@ def test(tst):
 
     if retcode != 0:
         raise Utils.WafError("Test phase failed")
+        
