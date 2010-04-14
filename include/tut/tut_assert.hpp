@@ -107,6 +107,29 @@ void ensure_equals(const M& msg, const LHS& actual, const RHS& expected)
     }
 }
 
+/**
+ * Tests two pointers for being equal.
+ * Throws if false.
+ *
+ * NB: both T and Q must have operator << defined somewhere, or
+ * client code will not compile at all!
+ */
+template <typename M, typename LHS, typename RHS>
+void ensure_equals(const M& msg, const LHS * const actual, const RHS * const expected)
+{
+    if (expected != actual)
+    {
+        std::stringstream ss;
+        detail::msg_prefix(ss,msg)
+           << "expected `"
+           << (void*)expected
+           << "` actual `"
+           << (void*)actual
+           << "`";
+        throw failure(ss.str());
+    }
+}
+
 template<typename M>
 void ensure_equals(const M& msg, const double& actual, const double& expected, const double& epsilon)
 {

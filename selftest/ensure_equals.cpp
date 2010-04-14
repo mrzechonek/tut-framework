@@ -315,5 +315,69 @@ void object::test<17>()
     }
 }
 
+/**
+ * Checks positive ensure_equals with pointers
+ */
+template<>
+template<>
+void object::test<18>()
+{
+    int value = 42;
+
+    int *lhs = &value;
+    int *rhs = &value;
+
+    ensure_equals("int*==int*", lhs, rhs);
+}
+
+/**
+ * Checks negative ensure_equals with pointers
+ */
+template<>
+template<>
+void object::test<19>()
+{
+    int value1 = 42;
+    int value2 = 314;
+
+    int *lhs = &value1;
+    int *rhs = &value2;
+
+    try
+    {
+        ensure_equals(lhs, rhs);
+        throw runtime_error("int*!=int*");
+    }
+    catch (const failure &ex)
+    {
+        std::stringstream ss;
+        ss << "expected `" << (void*)rhs << "` actual `" << (void*)lhs << "`";
+        ensure(string(ex.what()).find(ss.str()) != string::npos );
+    }
+}
+
+/**
+ * Checks negative ensure_equals with string pointers
+ */
+template<>
+template<>
+void object::test<20>()
+{
+    const char *lhs = "lhs";
+    const char *rhs = "rhs";
+
+    try
+    {
+        ensure_equals(lhs, rhs);
+        throw runtime_error("char*!=char*");
+    }
+    catch (const failure &ex)
+    {
+        std::stringstream ss;
+        ss << "expected `" << (void*)rhs << "` actual `" << (void*)lhs << "`";
+        ensure(string(ex.what()).find(ss.str()) != string::npos );
+    }
+}
+
 }
 
