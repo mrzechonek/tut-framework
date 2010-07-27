@@ -45,7 +45,7 @@ def configure(conf):
     conf.check_tool(Options.options.toolset)
 
     if Options.options.toolset == 'g++':
-        conf.env.CPPFLAGS = [ '-O2', '-Wall', '-Wextra', '-Weffc++', '-Werror', '-ftemplate-depth-100' ]
+        conf.env.CPPFLAGS = [ '-O2', '-Wall', '-Wextra', '-Weffc++', '-ftemplate-depth-100' ]
         if Options.options.debug:
             conf.env.CPPFLAGS += [ '-O0', '-g' ]
 
