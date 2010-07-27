@@ -45,7 +45,7 @@ private:
 
         if(tr.result != test_result::ok)
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << int(tr.result) << "\n"
                 << tr.group << "\n"
                 << tr.test << "\n"
@@ -148,7 +148,7 @@ public:
 
         if(!pids_.empty())
         {
-            std::stringstream ss;
+            std::ostringstream ss;
 
             // in parent, reap children
             for(std::map<pid_t, int>::iterator i = pids_.begin(); i != pids_.end(); ++i)
@@ -232,7 +232,7 @@ private:
             else
             {
                 // cannot kill, we are in trouble
-                std::stringstream ss;
+                std::ostringstream ss;
                 char e[1024];
                 ss << "child " << pid << " could not be killed with SIGTERM, " << strerror_r(errno, e, sizeof(e)) << std::endl;
                 fail(ss.str());
@@ -263,7 +263,7 @@ private:
                 }
                 else
                 {
-                    std::stringstream ss;
+                    std::ostringstream ss;
                     char e[1024];
                     ss << "child " << pid << " could not be killed with SIGKILL, " << strerror_r(errno, e, sizeof(e)) << std::endl;
                     fail(ss.str());
@@ -275,7 +275,7 @@ private:
 
             ensure_equals("child process exists after SIGKILL", ::kill(pid, 0), -1);
 
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "child " << pid << " had to be killed with SIGKILL";
             fail(ss.str());
         }
@@ -367,7 +367,7 @@ private:
     {
         if(WIFSIGNALED(status))
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "child killed by signal " << WTERMSIG(status)
                 << ": expected exit with code " << exit_status;
 
@@ -378,7 +378,7 @@ private:
         {
             if(WEXITSTATUS(status) != exit_status)
             {
-                std::stringstream ss;
+                std::ostringstream ss;
                 ss << "child exited, expected '"
                     << exit_status
                     << "' actual '"
@@ -391,7 +391,7 @@ private:
 
         if(WIFSTOPPED(status))
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "child stopped by signal " << WTERMSIG(status)
                 << ": expected exit with code " << exit_status;
             throw failure(ss.str().c_str());
@@ -404,7 +404,7 @@ private:
         {
             if(WTERMSIG(status) != signal)
             {
-                std::stringstream ss;
+                std::ostringstream ss;
                 ss << "child killed by signal, expected '"
                     << signal
                     << "' actual '"
@@ -416,7 +416,7 @@ private:
 
         if(WIFEXITED(status))
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "child exited with code " << WEXITSTATUS(status)
                 << ": expected signal " << signal;
 
@@ -425,7 +425,7 @@ private:
 
         if(WIFSTOPPED(status))
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "child stopped by signal " << WTERMSIG(status)
                 << ": expected kill by signal " << signal;
 

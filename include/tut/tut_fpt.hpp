@@ -120,7 +120,7 @@ namespace tut
                                                         static_cast<typename Traits::Result>(100) );
         if( !detail::check_tolerance(actual, expected, fraction) )
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << ( msg ? msg : "" )
             << ( msg ? ": " : "" )
             << "expected `"
@@ -153,7 +153,7 @@ namespace tut
 
         if( !detail::check_tolerance(actual, expected, fraction) )
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << ( msg ? msg : "" )
             << ( msg ? ": " : "" )
             << "expected `"

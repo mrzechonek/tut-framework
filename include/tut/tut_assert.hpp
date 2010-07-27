@@ -21,14 +21,14 @@ namespace tut
     namespace detail
     {
         template<typename M>
-        std::ostream &msg_prefix(std::ostream &str, const M &msg)
+        std::ostringstream &msg_prefix(std::ostringstream &str, const M &msg)
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << msg;
 
             if(!ss.str().empty())
             {
-                str << ss.rdbuf() << ": ";
+                str << msg << ": ";
             }
 
             return str;
@@ -88,7 +88,7 @@ void ensure_not(const M& msg, bool cond)
  * Tests two objects for being equal.
  * Throws if false.
  *
- * NB: both T and Q must have operator << defined somewhere, or
+ * NB: both LHS and RHS must have operator << defined somewhere, or
  * client code will not compile at all!
  */
 template <typename M, typename LHS, typename RHS>
@@ -96,7 +96,7 @@ void ensure_equals(const M& msg, const LHS& actual, const RHS& expected)
 {
     if (expected != actual)
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         detail::msg_prefix(ss,msg)
            << "expected `"
            << expected
@@ -119,7 +119,7 @@ void ensure_equals(const M& msg, const LHS * const actual, const RHS * const exp
 {
     if (expected != actual)
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         detail::msg_prefix(ss,msg)
            << "expected `"
            << (void*)expected
@@ -137,7 +137,7 @@ void ensure_equals(const M& msg, const double& actual, const double& expected, c
 
     if ( (actual != expected) && !((diff <= epsilon) && (diff >= -epsilon )) )
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         detail::msg_prefix(ss,msg)
            << std::scientific
            << std::showpoint
@@ -188,7 +188,7 @@ void ensure_equals(const std::string &msg,
     {
         if(*lhs_i != *rhs_i)
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             detail::msg_prefix(ss,msg)
                 << "expected `" << *rhs_i
                 << "` actual `" << *lhs_i
@@ -234,7 +234,7 @@ void ensure_distance(const M& msg, const T& actual, const T& expected, const T& 
 {
     if (expected-distance >= actual || expected+distance <= actual)
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         detail::msg_prefix(ss,msg)
             << " expected `"
             << expected-distance
@@ -260,7 +260,7 @@ void ensure_errno(const M& msg, bool cond)
     {
 #if defined(TUT_USE_POSIX)
         char e[512];
-        std::stringstream ss;
+        std::ostringstream ss;
         detail::msg_prefix(ss,msg)
            << strerror_r(errno, e, sizeof(e));
         throw failure(ss.str());
