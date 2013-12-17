@@ -1,6 +1,7 @@
 ---
 title: Introduction
 desc: an elevator pitch
+in_menu: true
 ---
 
 TUT is a small and portable unit test framework for C++. 

@@ -1,7 +1,17 @@
 ---
 title: News
 desc: changelog, releases and whatnot
+in_menu: true
 ---
+
+Move to Github
+--------------
+
+Long time no see!
+
+I've decided to move the project to Github, to decrease amount of typing needed
+to get a long-overdue release out.
+
 
 Doxygen documentation
 ---------------------

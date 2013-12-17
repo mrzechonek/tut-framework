@@ -3,7 +3,7 @@
 index.*.html:
   sort_info: 1
 
-news.*.html:
+news.en.html:
   sort_info: 2
 
 download.*.html:
@@ -15,22 +15,19 @@ example.*.html:
 howto.*.html:
   sort_info: 5
 
-forum.*.html:
-  sort_info: 6 
-
 faq.*.html:
-  sort_info: 7
+  sort_info: 6
 
 authors.*.html:
-  sort_info: 8
+  sort_info: 7
 
 source.*.html:
-  sort_info: 9
+  sort_info: 8
 
 links.*.html:
-  sort_info: 10
+  sort_info: 9
 
 copyright.*.html:
-  sort_info: 11
+  sort_info: 10
 
 
