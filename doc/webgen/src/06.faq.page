@@ -1,9 +1,10 @@
 ---
 title: FAQ
 desc: frequently asked questions
+in_menu: true
 ---
 
-{menu: {start_level: 2}}
+{menu: {options: {descendants: true, levels: [2]}}}
 
 What is TUT?
 ------------

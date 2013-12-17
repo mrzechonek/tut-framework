@@ -1,6 +1,7 @@
 ---
 title: Authors
 desc: credits and kudos
+in_menu: true
 ---
 
 Template Unit Test framework was designed and written by Vladimir Dyuzhev,
@@ -14,6 +15,4 @@ Since 2008 it's maintained and developed by [Michał Rzechonek](http://rzechonek
 We would like to thank all contributors, especially Nokia Siemens Networks IPT CS team for extensive
 real world testing.
 
-Please post your comments to [SourceForge Forum](http://sourceforge.net/forum/forum.php?forum_id=719643)
-
-Please send bug reports to [SourceForge Tracker](https://sourceforge.net/tracker/?group_id=69383&atid=524711)
+Please post questions, bug reports and feature requests to [Project page](https://github.com/mrzechonek/tut-framework/issues)

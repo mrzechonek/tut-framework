@@ -1,11 +1,11 @@
 \--- !omap
 
-- forum.*.html:
-    title: Forum
+- issues.html:
+    title: Issues
     in_menu: true
-    url: 'http://sourceforge.net/forum/forum.php?forum_id=719643'
+    dest_path: 'https://github.com/mrzechonek/tut-framework/issues'
 
-- source.*.html:
+- source.html:
     title: Reference Manual
     in_menu: true
-    url: 'doxygen/index.html'
+    dest_path: 'doxygen/index.html'
