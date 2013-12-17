@@ -1,0 +1,5 @@
+<map id="tut::callback" name="tut::callback">
+<area shape="rect" id="node3" href="$classtut_1_1console__reporter.html" title="tut::console_reporter" alt="" coords="5,80,144,107"/>
+<area shape="rect" id="node5" href="$classtut_1_1cppunit__reporter.html" title="tut::cppunit_reporter" alt="" coords="168,80,303,107"/>
+<area shape="rect" id="node7" href="$classtut_1_1xml__reporter.html" title="JUnit XML TUT reporter. " alt="" coords="328,80,443,107"/>
+</map>
