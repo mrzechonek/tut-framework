@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<changes>
+
+<p>
+Introduced a new exception <code>tut_error</code> as base for all TUT exceptions.
+I have two reasons to do it:
+<ul>
+	<li>
+		To avoid interference with <code>std::logic_error</code> leading to annoyed pitfalls
+		in inaccurate test code. For example:<pre>
+	// function to test
+	void foo(bool cond)
+	{
+		if (!cond) 
+		{
+			throw logic_error("condition is not set");
+		}
+	}
+	
+	// inside a test
+	try
+	{
+		ensure("something", some_expression); // can throw logic_error
+		foo(false);
+	}
+	catch (const logic_error&amp;)
+	{
+		// ok or pitfall?
+	}
+</pre>
+		Howewer, because of that <code>tut_error</code> is derived from 
+		<code>std::exception</code>, you should avoid catching <code>std::exception</code> 
+		in your test code without appropriate checks.
+	</li>
+	<li>
+		Some implementations of Standard C++ Library restrict size of a message passed into
+		a standard exception (from &lt;stdexcept&gt;) within narrow limits 
+		(usually, 256 bytes). Sometimes, it leads to incomplete messages in TUT reports. 
+	</li>
+</ul>
+</p>
+<p>
+Minors: 
+	<ul>
+		<li>
+			actual and expected values are quoted to increase failure messages readability;
+		</li>
+		<li>
+			if <code>ensure_distance</code> fails it will output a range in round brackets
+			because range borders are excluded from range (thanks to Koolin Timofey);
+		</li>
+	</ul>
+</p>
+<p>
+New function added: <code>ensure_not</code>. I found that <code>ensure_not(condition)</code>
+is more readable than <code>ensure(!condition)</code>.
+</p>
+
+</changes>

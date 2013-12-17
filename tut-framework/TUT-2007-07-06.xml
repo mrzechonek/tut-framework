@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<changes>
+
+<p>
+Introduced new header include style. There are two ways you can include the TUT headers:
+<pre>#include &lt;tut.h&gt;</pre>
+or:
+<pre>#include &lt;tut/tut.hpp&gt;</pre>
+The second option is preferred method whereas the first option is to provide backward 
+compatibility with clients of the previous releases.
+</p>
+<p>
+Minor fixes for Borland C++ Builder 6 and Microsoft Visual Studio 2005.
+</p>
+
+</changes>

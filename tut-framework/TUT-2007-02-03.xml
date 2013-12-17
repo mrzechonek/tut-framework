@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<changes>
+
+<p>
+Microsoft Visual C++ 2005 is supported. This version of compiler supports
+standard C++ exception handling in accordance with the C++ standard. It means 
+that only synchronous C++ exceptions thrown with a throw statement will be 
+caught in a catch block. 
+</p>
+<p>
+TUT uses two models of exception: handling SEH and standard C++ exception 
+handling. TUT expects that if any structured exception is raised it will be 
+handled by nearer C++ catch handler. It was default behavior of the previous
+version of compiler (option /EHs). But for the new version I have to turn on
+asynchronous exception handling (option /EHa).
+</p>
+<p>
+Minors: Some polish work.
+</p>
+<p>
+Note: I consider to stop maintain a lot of Makefiles due to lack of time and
+support only Jamfile.
+</p>
+
+</changes>

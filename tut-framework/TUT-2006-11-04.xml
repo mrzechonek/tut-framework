@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<changes>
+
+<p>
+Fix: lost changes from version <b>TUT-2006-03-29</b> are restored.
+</p>
+<p>
+Fix: errors appeared while compiling restartable example are fixed. 
+But there are a lot of outstanding works to support completely
+the last changes.
+</p>
+<p>
+Jamfiles for examples added.
+</p>
+
+</changes>
