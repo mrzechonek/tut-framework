@@ -29,6 +29,15 @@ namespace
     {
         throw foo_exception();
     }
+
+    void throw_std()
+    {
+        throw std::runtime_error("some std::exception");
+    }
+
+    void noop()
+    {
+    }
 }
 
 template<>
@@ -83,6 +92,42 @@ void object::test<3>()
         if (std::string(ex.what()).find("skip()") == std::string::npos )
         {
             fail("no_throw doesn't contain proper message");
+        }
+    }
+}
+
+template<>
+template<>
+void object::test<4>()
+{
+    set_test_name("checks throw std::exception");
+
+    try
+    {
+        ensure_THROW( throw_std(), std::exception );
+    }
+    catch (const failure& ex)
+    {
+        fail("positive throw expecting std::exception doesn't work");
+    }
+}
+
+template<>
+template<>
+void object::test<5>()
+{
+    set_test_name("checks throw std::exception");
+
+    try
+    {
+        ensure_THROW( noop(), std::exception );
+        fail("throw doesn't work");
+    }
+    catch (const failure& ex)
+    {
+        if (std::string(ex.what()).find("noop()") == std::string::npos )
+        {
+            fail("throw doesn't contain proper message");
         }
     }
 }

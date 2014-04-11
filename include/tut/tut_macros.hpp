@@ -13,23 +13,31 @@
  *  ensure_THROW( this_function_should_throw_bad_alloc(), std::bad_alloc );
  * \endcode
  */
-#define ensure_THROW( x, e ) \
-try         \
-{           \
-    x;      \
-    fail(#x " has not thrown expected exception " #e); \
-}                \
-catch(const e &) \
-{                \
-}                \
-catch(const std::exception &ex)  \
-{           \
-    fail( std::string(#x " has thrown unexpected exception ")+tut::type_name(ex)+": "+ex.what()); \
-} \
-catch(...)       \
-{                \
-    fail(#x " has thrown unexpected unknown exception"); \
-}
+#define ensure_THROW(x, e) \
+do                                                                         \
+{                                                                          \
+    try                                                                    \
+    {                                                                      \
+        try                                                                \
+        {                                                                  \
+            x;                                                             \
+        }                                                                  \
+        catch (const e&)                                                   \
+        {                                                                  \
+            break;                                                         \
+        }                                                                  \
+    }                                                                      \
+    catch (const std::exception& ex)                                       \
+    {                                                                      \
+        fail(std::string(#x " has thrown unexpected exception ") +         \
+             tut::type_name(ex) + ": " + ex.what());                       \
+    }                                                                      \
+    catch (...)                                                            \
+    {                                                                      \
+        fail(#x " has thrown unexpected unknown exception");               \
+    }                                                                      \
+    fail(#x " has not thrown expected exception " #e);                     \
+} while (false)
 
 #ifdef ensure_NO_THROW
 #error ensure_NO_THROW macro is already defined
