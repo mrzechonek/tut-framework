@@ -9,6 +9,11 @@
 #include <vector>
 #include <stdexcept>
 
+#if defined(TUT_USE_POSIX)
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 namespace tut
 {
 
