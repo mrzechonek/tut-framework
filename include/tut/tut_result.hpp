@@ -14,6 +14,11 @@
 #include <typeinfo>
 #endif
 
+#if defined(TUT_USE_POSIX)
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 namespace tut
 {
 
@@ -84,7 +89,7 @@ struct test_result : public test_result_posix
     std::string name;
 
     /**
-     * result of a test 
+     * result of a test
      */
     enum result_type
     {
@@ -93,10 +98,10 @@ struct test_result : public test_result_posix
         ex,       ///< test throwed an exceptions
         warn,     ///< test finished successfully, but test destructor throwed
         term,     ///< test forced test application to terminate abnormally
-        ex_ctor,  ///< 
-        rethrown, ///< 
-        skipped,  ///< 
-        dummy     ///< 
+        ex_ctor,  ///<
+        rethrown, ///<
+        skipped,  ///<
+        dummy     ///<
     };
 
     result_type result;

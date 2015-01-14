@@ -3,6 +3,12 @@
 #include <tut/tut.hpp>
 #include <cassert>
 
+#if defined(TUT_USE_POSIX)
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
+
 /**
  * Template Unit Tests Framework for C++.
  * http://tut.dozen.ru
