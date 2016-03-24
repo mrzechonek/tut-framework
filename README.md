@@ -1,6 +1,8 @@
 tut-framework
 =============
 
+[![Build Status](https://travis-ci.org/mrzechonek/tut-framework.svg?branch=master)](https://travis-ci.org/mrzechonek/tut-framework)
+
 TUT is a small and portable unit test framework for C++.
 
 * TUT is very portable, no matter what compiler or OS you use.
