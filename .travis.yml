@@ -1,0 +1,7 @@
+language: cpp
+install: true
+before_script:
+ - ./waf configure
+script:
+ - ./waf build
+ - ./waf test
