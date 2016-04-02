@@ -147,10 +147,6 @@ namespace tut
         const StdNumericLimitsNotAvailable static_check[ std::numeric_limits<U>::is_specialized ] = { 0 };
         static_cast<void>(static_check);
 
-        typedef typename detail::If<std::numeric_limits<U>::is_integer,
-                                    double,
-                                    U>::type Tolerance;
-
         if( !detail::check_tolerance(actual, expected, fraction) )
         {
             std::ostringstream ss;
