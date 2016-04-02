@@ -237,11 +237,11 @@ struct Key
 
 typedef std::string Value;
 
-}
-
 std::ostream &operator<<(std::ostream &ss, const std::pair<Key, Value> &pair)
 {
     return ss << "(" << pair.first.k_ << "," << pair.second << ")";
+}
+
 }
 
 /**
