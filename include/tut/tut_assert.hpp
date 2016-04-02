@@ -43,7 +43,7 @@ namespace
  * Tests provided condition.
  * Throws if false.
  */
-void ensure(bool cond)
+static inline void ensure(bool cond)
 {
     if (!cond)
     {
@@ -56,7 +56,7 @@ void ensure(bool cond)
  * Tests provided condition.
  * Throws if true.
  */
-void ensure_not(bool cond)
+static inline void ensure_not(bool cond)
 {
     ensure(!cond);
 }
@@ -273,7 +273,7 @@ void ensure_errno(const M& msg, bool cond)
 /**
  * Unconditionally fails with message.
  */
-void fail(const char* msg = "")
+static inline void fail(const char* msg = "")
 {
     throw failure(msg);
 }
@@ -287,7 +287,7 @@ void fail(const M& msg)
 /**
  * Mark test case as known failure and skip execution.
  */
-void skip(const char* msg = "")
+static inline void skip(const char* msg = "")
 {
     throw skipped(msg);
 }
