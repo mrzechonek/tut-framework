@@ -4,6 +4,20 @@ from waflib import Task, Options, Utils, Errors
 from waflib.TaskGen import extension, feature, after_method
 import os
 
+from tempfile import NamedTemporaryFile
+
+from contextlib import contextmanager
+
+@contextmanager
+def Wrapper(script):
+    wrapper = NamedTemporaryFile(delete=False)
+    wrapper.write(script)
+    wrapper.close()
+    os.chmod(wrapper.name, 0777)
+
+    yield wrapper.name
+
+    os.unlink(wrapper.name)
 
 class gcov(Task.Task):
     color='PINK'
@@ -13,12 +27,18 @@ class gcov(Task.Task):
         return "Coverage"
 
     def run(self):
-        command = self.env.GCOVR
-        args = ['-r', self.srcnode.abspath()]
-        proc = Utils.subprocess.Popen(command + args)
-        proc.communicate()
-        if proc.returncode != 0:
-            raise Errors.WafError("Test %s failed" % self)
+        # gcovr expects a single executable, but invoking llvm-cov requires
+        # running "llvm-cov gcov ..." shell command
+        wrapper_script = "#!/bin/sh\n{GCOV} {FLAGS} $*".format(
+            GCOV="".join(self.env.GCOV),
+            FLAGS="".join(self.env.GCOV_FLAGS))
+
+        with Wrapper(wrapper_script) as wrapper:
+            args = ['--gcov-executable=%s' % wrapper, '-r', self.srcnode.abspath()]
+            proc = Utils.subprocess.Popen(self.env.GCOVR + args)
+            proc.communicate()
+            if proc.returncode != 0:
+                raise Errors.WafError("Test %s failed" % self)
 
     def runnable_status(self):
         if Options.options.coverage:
@@ -43,7 +63,12 @@ def options(opt):
 
 def configure(cnf):
     if cnf.options.coverage:
-        cnf.find_program('gcov', var='GCOV')
+        if cnf.options.check_cxx_compiler == 'clang++':
+            cnf.find_program('llvm-cov', var='GCOV', mandatory=False)
+            cnf.env.GCOV_FLAGS += ['gcov']
+        else:
+            cnf.find_program('gcov', var='GCOV', mandatory=False)
+
         cnf.find_program('gcovr', var='GCOVR', mandatory=False)
         cnf.check_cc(
             lib='gcov',
