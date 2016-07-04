@@ -2,6 +2,8 @@
 #define TUT_H_GUARD
 #include <tut/tut_config.hpp>
 
+#undef public
+#undef private
 #include <iostream>
 #include <map>
 #include <vector>
