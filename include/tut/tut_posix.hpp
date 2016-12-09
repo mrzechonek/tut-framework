@@ -75,24 +75,36 @@ struct tut_posix
 {
     pid_t fork()
     {
+#ifdef TUT_USE_RTTI
         test_object<T> *self = dynamic_cast< tut::test_object<T>* >(this);
         ensure("trying to call 'tut_fork' in ctor of test object", self != NULL);
+#else
+        test_object<T> *self = static_cast< tut::test_object<T>* >(this);
+#endif
 
         return self->fork_();
     }
 
     pid_t waitpid(pid_t pid, int *status, int flags = 0)
     {
+#ifdef TUT_USE_RTTI
         test_object<T> *self = dynamic_cast< tut::test_object<T>* >(this);
         ensure("trying to call 'tut_waitpid' in ctor of test object", self != NULL);
+#else
+        test_object<T> *self = static_cast< tut::test_object<T>* >(this);
+#endif
 
         return self->waitpid_(pid, status, flags);
     }
 
     void ensure_child_exit(pid_t pid, int exit_status = 0)
     {
+#ifdef TUT_USE_RTTI
         test_object<T> *self = dynamic_cast< tut::test_object<T>* >(this);
         ensure("trying to call 'ensure_child_exit' in ctor of test object", self != NULL);
+#else
+        test_object<T> *self = static_cast< tut::test_object<T>* >(this);
+#endif
 
         int status;
         self->waitpid_(pid, &status);
@@ -103,8 +115,12 @@ struct tut_posix
 
     void ensure_child_signal(pid_t pid, int signal = SIGTERM)
     {
+#ifdef TUT_USE_RTTI
         test_object<T> *self = dynamic_cast< tut::test_object<T>* >(this);
         ensure("trying to call 'ensure_child_signal' in ctor of test object", self != NULL);
+#else
+        test_object<T> *self = static_cast< tut::test_object<T>* >(this);
+#endif
 
         int status;
         self->waitpid_(pid, &status);
@@ -114,10 +130,12 @@ struct tut_posix
 
     std::set<pid_t> get_pids() const
     {
-        using namespace std;
-
+#ifdef TUT_USE_RTTI
         const test_object<T> *self = dynamic_cast< const tut::test_object<T>* >(this);
         ensure("trying to call 'get_pids' in ctor of test object", self != NULL);
+#else
+        const test_object<T> *self = static_cast< const tut::test_object<T>* >(this);
+#endif
 
         return self->get_pids_();
     }

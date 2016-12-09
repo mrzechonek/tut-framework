@@ -199,6 +199,10 @@ template<>
 template<>
 void object_posix::test<1>()
 {
+#if !defined(TUT_USE_RTTI)
+    skip();
+#endif
+
     counter cnt;
     tr.set_callback(&cnt);
     tr.run_tests("internal posix");
