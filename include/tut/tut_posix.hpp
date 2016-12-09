@@ -188,7 +188,11 @@ public:
 
             if(!ss.str().empty())
             {
+#if __cplusplus >= 201103L
+                std::cerr << ss.rdbuf() << std::endl;
+#else
                 fail(ss.str().c_str());
+#endif
             }
         }
     }

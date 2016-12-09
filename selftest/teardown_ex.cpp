@@ -27,7 +27,9 @@ struct teardown_ex
             n++;
             if( n % d == 1 )
             {
+#if __cplusplus < 201103L
                 throw runtime_error("ex in destructor");
+#endif
             }
 #if defined(TUT_USE_SEH)
             else if( n % d == 0 )
@@ -38,7 +40,9 @@ struct teardown_ex
 #endif
             else
             {
+#if __cplusplus < 201103L
                 throw 0;
+#endif
             }
         }
     };
@@ -99,6 +103,10 @@ template<>
 template<>
 void object::test<1>()
 {
+#if __cplusplus >= 201103L
+    skip();
+#endif
+
     set_test_name("checks getting std::exception");
 
     test_result res;
@@ -113,6 +121,10 @@ template<>
 template<>
 void object::test<2>()
 {
+#if __cplusplus >= 201103L
+    skip();
+#endif
+
     set_test_name("checks getting unknown std::exception");
 
     test_result res;
