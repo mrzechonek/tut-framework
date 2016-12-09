@@ -20,7 +20,7 @@ class cppunit_reporter : public tut::callback
     std::vector<tut::test_result> failed_tests_;
     std::vector<tut::test_result> passed_tests_;
     const std::string filename_;
-    std::auto_ptr<std::ostream> stream_;
+    TUT_UNIQUE_PTR<std::ostream> stream_;
 
 
     cppunit_reporter(const cppunit_reporter &);

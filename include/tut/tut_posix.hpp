@@ -2,6 +2,12 @@
 #define TUT_FORK_H_GUARD
 #include <tut/tut_config.hpp>
 
+#if __cplusplus >= 201103L
+#define TUT_UNIQUE_PTR std::unique_ptr
+#else
+#define TUT_UNIQUE_PTR std::auto_ptr
+#endif
+
 #if defined(TUT_USE_POSIX)
 #include <errno.h>
 #include <unistd.h>
