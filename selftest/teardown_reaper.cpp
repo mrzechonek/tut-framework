@@ -129,7 +129,11 @@ void object::test<2>()
 
     test_result res;
     ensure("test exists", tr.run_test("internal", 2, res) );
+#if __cplusplus >= 201103L
+    ensure("ok", res.result == test_result::ok);
+#else
     ensure("warning", res.result == test_result::warn);
+#endif
 
     ensure_equals("child count", teardown_reaper::children.size(), size_t(3));
 

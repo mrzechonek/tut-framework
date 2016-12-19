@@ -29,7 +29,7 @@ class xml_reporter : public tut::callback
 
     TestGroups all_tests_; /// holds all test results
     const std::string filename_; /// filename base
-    std::auto_ptr<std::ostream> stream_;
+    TUT_UNIQUE_PTR<std::ostream> stream_;
 
     /**
      * \brief Builds "testcase" XML entity with given parameters

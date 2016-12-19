@@ -14,13 +14,13 @@ def options(opt):
     gr = opt.add_option_group('build options')
     gr.add_option('--debug',      action='store_true', help='Build debug variant', default=False)
 
-    gr.add_option('--with-rtti',    action='store_true', help='Enable RTTI (on by default)', default=True)
+    gr.add_option('--with-rtti',    action='store_true', help='Enable RTTI (autodetect by default)', default=None)
     gr.add_option('--without-rtti', action='store_false', dest='with_rtti')
 
     gr.add_option('--with-seh',    action='store_true', help='Build with SEH extensions for win32 (off by default)', default=False)
     gr.add_option('--without-seh', action='store_false', dest='with_seh')
 
-    gr.add_option('--with-posix',    action='store_true', help='Build with POSIX extensions (off by default)', default=False)
+    gr.add_option('--with-posix',    action='store_true', help='Build with POSIX extensions (autodetect by default)', default=None)
     gr.add_option('--without-posix', action='store_false', dest='with_posix')
 
 def configure(cnf):
@@ -44,7 +44,13 @@ def configure(cnf):
 
         cnf.env.CPPFLAGS += [ '/DNOMINMAX' ]
 
-    global trues
+    if cnf.options.with_posix is None:
+        cnf.options.with_posix = cnf.check_cxx(fragment='#include <unistd.h>\nint main() { fork(); }',
+                                               msg='Checking for fork()', mandatory=False)
+
+    if cnf.options.with_rtti is None:
+        cnf.options.with_rtti = cnf.check_cxx(fragment='#include <typeinfo>\nint main() { typeid(int).name(); }',
+                                               msg='Checking for typeid()', mandatory=False)
 
     if cnf.options.with_posix:
         cnf.define_cond('TUT_USE_POSIX', 1)

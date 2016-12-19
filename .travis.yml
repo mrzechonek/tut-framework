@@ -47,6 +47,16 @@ matrix:
           env:
             - CXX=g++-5
             - COMPILER=g++
+        - compiler: gcc
+          addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                packages:
+                    - g++-6
+          env:
+            - CXX=g++-6
+            - COMPILER=g++
         - compiler: clang
           addons:
             apt:
@@ -67,12 +77,22 @@ matrix:
         #   addons:
         #     apt:
         #         sources:
-        #             - llvm-toolchain-precise-3.7
+        #             - llvm-toolchain-trusty-3.7
         #         packages:
         #          - clang-3.7
         #   env:
         #     - CXX=clang++-3.7
         #     - COMPILER=clang++
+        - compiler: clang
+          addons:
+            apt:
+                sources:
+                    - llvm-toolchain-trusty-3.8
+                packages:
+                 - clang-3.8
+          env:
+            - CXX=clang++-3.8
+            - COMPILER=clang++
 
 install:
     - sudo pip install gcovr
