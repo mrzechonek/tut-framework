@@ -13,7 +13,7 @@ def Wrapper(script):
     wrapper = NamedTemporaryFile(delete=False)
     wrapper.write(script)
     wrapper.close()
-    os.chmod(wrapper.name, 0777)
+    os.chmod(wrapper.name, 0o777)
 
     yield wrapper.name
 
