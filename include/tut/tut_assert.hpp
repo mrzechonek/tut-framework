@@ -190,6 +190,89 @@ void ensure_equals(const LHS& actual, const RHS& expected)
     ensure_equals("Values are not equal", actual, expected);
 }
 
+template<typename M, typename VALUE>
+void ensure_isnan(const M& msg, const VALUE& val)
+{
+	if (!std::isnan(val))
+	{
+		std::ostringstream ss;
+		detail::msg_prefix(ss, msg)
+			<< std::scientific
+			<< std::showpoint
+			<< std::setprecision(16)
+			<< "value: `" << val << "`";
+		throw failure(ss.str());
+	}
+}
+
+template <typename VALUE>
+void ensure_isnan(const VALUE& val)
+{
+	ensure_isnan("Value is a valid number (not a NaN)", val);
+}
+
+template<typename M, typename VALUE>
+void ensure_not_isnan(const M& msg, const VALUE& val)
+{
+	if (std::isnan(val))
+	{
+		std::ostringstream ss;
+		detail::msg_prefix(ss, msg)
+			<< std::scientific
+			<< std::showpoint
+			<< std::setprecision(16)
+			<< "value: `" << val << "`";
+		throw failure(ss.str());
+	}
+}
+
+template <typename VALUE>
+void ensure_not_isnan(const VALUE& val)
+{
+	ensure_not_isnan("Value is not a valid number (NaN)", val);
+}
+
+template<typename M, typename VALUE>
+void ensure_isinf(const M& msg, const VALUE& val)
+{
+	if (!std::isinf(val))
+	{
+		std::ostringstream ss;
+		detail::msg_prefix(ss, msg)
+			<< std::scientific
+			<< std::showpoint
+			<< std::setprecision(16)
+			<< "value: `" << val << "`";
+		throw failure(ss.str());
+	}
+}
+
+template <typename VALUE>
+void ensure_isinf(const VALUE& val)
+{
+	ensure_isinf("Value is not infinity", val);
+}
+
+template<typename M, typename VALUE>
+void ensure_isfinite(const M& msg, const VALUE& val)
+{
+	if (!std::isfinite(val))
+	{
+		std::ostringstream ss;
+		detail::msg_prefix(ss, msg)
+			<< std::scientific
+			<< std::showpoint
+			<< std::setprecision(16)
+			<< "value: `" << val << "`";
+		throw failure(ss.str());
+	}
+}
+
+template <typename VALUE>
+void ensure_isfinite(const VALUE& val)
+{
+	ensure_isfinite("Value is not a finite number (infinity)", val);
+}
 
 template<typename LhsIterator, typename RhsIterator>
 void ensure_equals(const std::string &msg,
