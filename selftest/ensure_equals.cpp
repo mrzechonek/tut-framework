@@ -147,9 +147,9 @@ template<>
 template<>
 void object::test<13>()
 {
-    double lhs = 6.28;
-    double rhs = 3.14;
-    lhs /= 2;
+    double lhs = 1000000.;
+    double rhs = 200000.;
+    lhs = lhs / std::sqrt(5) / std::sqrt(5);
 
     ensure_equals("double==double", lhs, rhs);
 }
@@ -167,7 +167,7 @@ void object::test<14>()
 
     try
     {
-        ensure_equals(lhs + 2*std::numeric_limits<double>::epsilon(), rhs);
+        ensure_equals(lhs + 10*std::numeric_limits<double>::epsilon(), rhs);
         throw runtime_error("double!=double");
     }
     catch (const failure &ex)
@@ -379,5 +379,24 @@ void object::test<20>()
     }
 }
 
+/**
+* Checks positive ensure_equals with mixing floating point types (float + double)
+*/
+template<>
+template<>
+void object::test<21>()
+{
+#if __cplusplus < 201103L
+    skip();
+#endif
+
+    float flhs = 1000000., frhs = 200000.;
+    double drhs = 200000., dlhs = 1000000.;
+    flhs = flhs / std::sqrt(5) / std::sqrt(5);
+    dlhs = dlhs / std::sqrt(5) / std::sqrt(5);
+
+    ensure_equals("float==double", flhs, drhs);
+    ensure_equals("double==float", dlhs, frhs);
 }
 
+}

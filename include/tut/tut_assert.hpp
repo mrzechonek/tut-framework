@@ -8,6 +8,10 @@
 #include <cassert>
 #include <cmath>
 
+#if __cplusplus >= 201103L
+#include <type_traits>
+#endif
+
 #if defined(TUT_USE_POSIX)
 #include <errno.h>
 #include <cstring>
@@ -92,7 +96,12 @@ void ensure_not(const M& msg, bool cond)
  * client code will not compile at all!
  */
 template <typename M, typename LHS, typename RHS>
-void ensure_equals(const M& msg, const LHS& actual, const RHS& expected)
+#if __cplusplus >= 201103L
+typename std::enable_if<!std::is_floating_point<LHS>::value && !std::is_floating_point<RHS>::value, void>::type
+#else
+void
+#endif
+    ensure_equals(const M& msg, const LHS& actual, const RHS& expected)
 {
     if (expected != actual)
     {
@@ -130,12 +139,22 @@ void ensure_equals(const M& msg, const LHS * const actual, const RHS * const exp
     }
 }
 
+#if __cplusplus >= 201103L
+template<typename M, typename LHS, typename RHS, typename EPS>
+typename std::enable_if<std::is_floating_point<LHS>::value || std::is_floating_point<RHS>::value, void>::type
+    ensure_equals(const M& msg, const LHS& actual, const RHS& expected, const EPS& epsilon)
+{
+	if((actual != expected)
+		&& (std::isnan(actual) || std::isnan(expected)
+		|| (std::abs(actual - expected) > epsilon)
+		|| (std::abs(actual - expected) < std::numeric_limits<EPS>::min())))
+#else
 template<typename M>
 void ensure_equals(const M& msg, const double& actual, const double& expected, const double& epsilon)
 {
-    const double diff = actual - expected;
-
-    if ( (actual != expected) && !((diff <= epsilon) && (diff >= -epsilon )) )
+	const double diff = actual - expected;
+	if ((actual != expected) && !((diff <= epsilon) && (diff >= -epsilon)))
+#endif
     {
         std::ostringstream ss;
         detail::msg_prefix(ss,msg)
@@ -149,10 +168,20 @@ void ensure_equals(const M& msg, const double& actual, const double& expected, c
     }
 }
 
+#if __cplusplus >= 201103L
+template<typename M, typename LHS, typename RHS>
+typename std::enable_if<std::is_floating_point<LHS>::value || std::is_floating_point<RHS>::value, void>::type
+    ensure_equals(const M& msg, const LHS& actual, const RHS& expected)
+{
+	auto epsilon = sizeof(LHS) < sizeof(RHS) ? std::numeric_limits<LHS>::epsilon() : std::numeric_limits<RHS>::epsilon();
+# else
 template<typename M>
 void ensure_equals(const M& msg, const double& actual, const double& expected)
 {
-    ensure_equals(msg, actual, expected, std::numeric_limits<double>::epsilon());
+	double epsilon = std::numeric_limits<double>::epsilon();
+#endif
+
+    ensure_equals(msg, actual, expected, epsilon * std::abs(actual + expected));
 }
 
 template <typename LHS, typename RHS>
@@ -161,6 +190,89 @@ void ensure_equals(const LHS& actual, const RHS& expected)
     ensure_equals("Values are not equal", actual, expected);
 }
 
+template<typename M, typename VALUE>
+void ensure_isnan(const M& msg, const VALUE& val)
+{
+	if (!std::isnan(val))
+	{
+		std::ostringstream ss;
+		detail::msg_prefix(ss, msg)
+			<< std::scientific
+			<< std::showpoint
+			<< std::setprecision(16)
+			<< "value: `" << val << "`";
+		throw failure(ss.str());
+	}
+}
+
+template <typename VALUE>
+void ensure_isnan(const VALUE& val)
+{
+	ensure_isnan("Value is a valid number (not a NaN)", val);
+}
+
+template<typename M, typename VALUE>
+void ensure_not_isnan(const M& msg, const VALUE& val)
+{
+	if (std::isnan(val))
+	{
+		std::ostringstream ss;
+		detail::msg_prefix(ss, msg)
+			<< std::scientific
+			<< std::showpoint
+			<< std::setprecision(16)
+			<< "value: `" << val << "`";
+		throw failure(ss.str());
+	}
+}
+
+template <typename VALUE>
+void ensure_not_isnan(const VALUE& val)
+{
+	ensure_not_isnan("Value is not a valid number (NaN)", val);
+}
+
+template<typename M, typename VALUE>
+void ensure_isinf(const M& msg, const VALUE& val)
+{
+	if (!std::isinf(val))
+	{
+		std::ostringstream ss;
+		detail::msg_prefix(ss, msg)
+			<< std::scientific
+			<< std::showpoint
+			<< std::setprecision(16)
+			<< "value: `" << val << "`";
+		throw failure(ss.str());
+	}
+}
+
+template <typename VALUE>
+void ensure_isinf(const VALUE& val)
+{
+	ensure_isinf("Value is not infinity", val);
+}
+
+template<typename M, typename VALUE>
+void ensure_isfinite(const M& msg, const VALUE& val)
+{
+	if (!std::isfinite(val))
+	{
+		std::ostringstream ss;
+		detail::msg_prefix(ss, msg)
+			<< std::scientific
+			<< std::showpoint
+			<< std::setprecision(16)
+			<< "value: `" << val << "`";
+		throw failure(ss.str());
+	}
+}
+
+template <typename VALUE>
+void ensure_isfinite(const VALUE& val)
+{
+	ensure_isfinite("Value is not a finite number (infinity)", val);
+}
 
 template<typename LhsIterator, typename RhsIterator>
 void ensure_equals(const std::string &msg,
