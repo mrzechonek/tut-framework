@@ -103,19 +103,21 @@ def build(bld):
                 'prefix=%(prefix)s\n'
                 'INSTALL_BIN=${prefix}/bin\n'
                 'INSTALL_INC=${prefix}/include\n'
-                'INSTALL_LIB=${prefix}/lib\n'
+                'INSTALL_LIB=${prefix}/%(libdir)s\n'
                 'exec_prefix=${prefix}\n'
-                'libdir=${exec_prefix}/lib\n'
+                'libdir=${exec_prefix}/%(libdir)s\n'
                 'includedir=${prefix}/include\n'
                 'Name: TUT\n'
                 'Description: Template Unit Test framework\n'
                 'Version: %(version)s\n'
                 'Requires:\n'
-                'Cflags: -I${includedir}\n' % dict(prefix=bld.options.destdir, version=VERSION))
+                'Cflags: -I${includedir}\n' % dict(prefix=task.env.PREFIX,
+                                                   libdir=os.path.relpath(task.env.LIBDIR, task.env.PREFIX),
+                                                   version=VERSION))
 
     bld(target='tut.pc',
         rule=write_pkgconfig,
-        install_path=os.path.join('${PREFIX}', 'lib', 'pkgconfig'))
+        install_path=os.path.join('${LIBDIR}', 'pkgconfig'))
 
     for example in ('simple', 'basic', 'shared_ptr', 'restartable'):
         bld(features='cxx cprogram',
