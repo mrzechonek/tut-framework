@@ -12,6 +12,12 @@
 #include <type_traits>
 #endif
 
+#if __cplusplus >= 201103L
+#define TUT_NORETURN [[noreturn]]
+#else
+#define TUT_NORETURN
+#endif
+
 #if defined(TUT_USE_POSIX)
 #include <errno.h>
 #include <cstring>
@@ -385,13 +391,13 @@ void ensure_errno(const M& msg, bool cond)
 /**
  * Unconditionally fails with message.
  */
-static inline void fail(const char* msg = "")
+TUT_NORETURN static inline void fail(const char* msg = "")
 {
     throw failure(msg);
 }
 
 template<typename M>
-void fail(const M& msg)
+TUT_NORETURN void fail(const M& msg)
 {
     throw failure(msg);
 }
@@ -399,13 +405,13 @@ void fail(const M& msg)
 /**
  * Mark test case as known failure and skip execution.
  */
-static inline void skip(const char* msg = "")
+TUT_NORETURN static inline void skip(const char* msg = "")
 {
     throw skipped(msg);
 }
 
 template<typename M>
-void skip(const M& msg)
+TUT_NORETURN void skip(const M& msg)
 {
     throw skipped(msg);
 }
